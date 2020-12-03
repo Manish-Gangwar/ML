@@ -65,7 +65,7 @@ if(!require(ggplot2)){install.packages("ggplot2")}
 if(!require(dplyr)){install.packages("dplyr")}
 if(!require(rfm)) {install.packages("rfm")}
 if(!require(lubridate)) {install.packages("lubridate")}
-if(!require("ggbiplot")) {install_github("ggbiplot","vqv")}
+if(!require("ggbiplot")) {install_github("vqv/ggbiplot")}
 if(!require("plyr")) {install.packages("plyr")}
 if(!require("scales")) {install.packages("scales")}
 if(!require("grid")) {install.packages("grid")}
