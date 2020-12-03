@@ -1,6 +1,15 @@
 ###########################################################
 #         Regression Tree App (server)              #
 ###########################################################
+try(require("shiny")||install.packages("shiny"))
+try(require("pastecs")||install.packages("pastecs"))
+try(require("rpart")||install.packages("rpart"))
+try(require("rpart.plot")||install.packages("rpart.plot"))
+try(require("dplyr")||install.packages("dplyr"))
+try(require("Hmisc")||install.packages("Hmisc"))
+try(require("party")||install.packages("party"))
+try(require("partykit")||install.packages("partykit"))
+
 library(shiny)
 library(rpart)
 library(pastecs)
