@@ -36,18 +36,14 @@ try(require("dplyr")||install.packages("dplyr"))
 try(require("Hmisc")||install.packages("Hmisc"))
 try(require("randomForest")||install.packages("randomForest"))
 try(require("hydroGOF")||install.packages("hydroGOF"))
-
-suppressPackageStartupMessages({
-  try(require("pastecs")||install.packages("pastecs"))
-  try(require("rpart")||install.packages("rpart"))
-  try(require("dplyr")||install.packages("dplyr"))
-  try(require("Hmisc")||install.packages("Hmisc"))
-  try(require("randomForest")||install.packages("randomForest"))
-  try(require("hydroGOF")||install.packages("hydroGOF"))
-  
-  try(require("party")||install.packages("party"))
-  try(require("partykit")||install.packages("partykit"))
-})
+try(require("pastecs")||install.packages("pastecs"))
+try(require("rpart")||install.packages("rpart"))
+try(require("dplyr")||install.packages("dplyr"))
+try(require("Hmisc")||install.packages("Hmisc"))
+try(require("randomForest")||install.packages("randomForest"))
+try(require("hydroGOF")||install.packages("hydroGOF"))
+try(require("party")||install.packages("party"))
+try(require("partykit")||install.packages("partykit"))
 
 if(!require(text2vec)) {install.packages("text2vec")}
 if(!require(tm)) {install.packages("tm")}
@@ -56,28 +52,28 @@ if(!require(wordcloud)) {install.packages("wordcloud")}
 if(!require(slam)) {install.packages("slam")}
 if(!require(maptpx)) {install.packages("maptpx")}
 if(!require(igraph)) {install.packages("igraph")}
-if (!require("nFactors")) {install.packages("nFactors")}
-if (!require("qgraph")) {install.packages("qgraph")}
-if (!require("corrplot")) {install.packages("corrplot")}
+if(!require("nFactors")) {install.packages("nFactors")}
+if(!require("qgraph")) {install.packages("qgraph")}
+if(!require("corrplot")) {install.packages("corrplot")}
 if(!require("pastecs")){install.packages("pastecs")}
 if(!require("RColorBrewer")){install.packages("RColorBrewer")}
 if(!require("Hmisc")){install.packages("Hmisc")}
 if(!require("ggplot2")){install.packages("ggplot2")}
 if(!require("reshape2")){install.packages("reshape2")}
-if (!require(RColorBrewer)){install.packages("RColorBrewer")}
-if (!require(ggplot2)){install.packages("ggplot2")}
-if (!require(dplyr)){install.packages("dplyr")}
-if (!require(rfm)) {install.packages("rfm")}
-if (!require(lubridate)) {install.packages("lubridate")}
-if (!require("ggbiplot")) {install_github("ggbiplot","vqv")}
-if (!require("plyr")) {install.packages("plyr")}
-if (!require("scales")) {install.packages("scales")}
-if (!require("grid")) {install.packages("grid")}
-if (!require("cluster")) {install.packages("cluster")}
-if (!require("mclust")) {install.packages("mclust")}
-if (!require("MASS")) {install.packages("MASS")}
-if (!require("scales")) {install.packages("scales")}
-if (!require("gridExtra")) {install.packages("gridExtra")}
+if(!require(RColorBrewer)){install.packages("RColorBrewer")}
+if(!require(ggplot2)){install.packages("ggplot2")}
+if(!require(dplyr)){install.packages("dplyr")}
+if(!require(rfm)) {install.packages("rfm")}
+if(!require(lubridate)) {install.packages("lubridate")}
+if(!require("ggbiplot")) {install_github("ggbiplot","vqv")}
+if(!require("plyr")) {install.packages("plyr")}
+if(!require("scales")) {install.packages("scales")}
+if(!require("grid")) {install.packages("grid")}
+if(!require("cluster")) {install.packages("cluster")}
+if(!require("mclust")) {install.packages("mclust")}
+if(!require("MASS")) {install.packages("MASS")}
+if(!require("scales")) {install.packages("scales")}
+if(!require("gridExtra")) {install.packages("gridExtra")}
 
 
 
