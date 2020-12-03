@@ -1,6 +1,7 @@
 ###########################################################
 #         Regression Tree App (server)              #
 ###########################################################
+try(require(shiny) || install.packages("shiny"))
   try(require("shiny")||install.packages("shiny"))
   try(require("pastecs")||install.packages("pastecs"))
   try(require("rpart")||install.packages("rpart"))
