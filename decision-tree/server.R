@@ -1,7 +1,6 @@
 ###########################################################
 #         Regression Tree App (server)              #
 ###########################################################
-suppressPackageStartupMessages({
   try(require("shiny")||install.packages("shiny"))
   try(require("pastecs")||install.packages("pastecs"))
   try(require("rpart")||install.packages("rpart"))
@@ -12,7 +11,7 @@ suppressPackageStartupMessages({
   
   try(require("party")||install.packages("party"))
   try(require("partykit")||install.packages("partykit"))
-})
+
 
 library(shiny)
 library(rpart)
