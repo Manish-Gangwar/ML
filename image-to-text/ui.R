@@ -6,7 +6,7 @@ library("devtools")
 
 try(require("shiny")||install.packages("shiny"))
 try(require("tesseract")||install.packages("tesseract"))
-try(require("magick")||devtools::install_github("ropensci/magick"))
+try(require("magick")||install.packages("magick"))
 try(require("magrittr")||install.packages("magrittr"))
 
 library("shiny")
