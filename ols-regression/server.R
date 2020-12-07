@@ -7,6 +7,7 @@ if(!require("RColorBrewer")){install.packages("RColorBrewer")}
 if(!require("Hmisc")){install.packages("Hmisc")}
 if(!require("ggplot2")){install.packages("ggplot2")}
 if(!require("reshape2")){install.packages("reshape2")}
+if (!require("corrplot")) {install.packages("corrplot")}
 
 library(shiny)
 library(pastecs)
@@ -14,6 +15,7 @@ library(RColorBrewer)
 library(Hmisc)
 library(ggplot2)
 library(reshape2)
+library(corrplot)
 
 # library(gplot)
 
@@ -116,6 +118,8 @@ output$summary = renderPrint({
     out()[1:2]
       }
 })
+
+
 
 # output$scatterplots <- renderUI({
 #   if (is.null(input$file)) {return(NULL)}
