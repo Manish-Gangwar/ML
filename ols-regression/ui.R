@@ -70,8 +70,8 @@ shinyUI(pageWithSidebar(
                 
                 tabPanel("Summary Stats", verbatimTextOutput("summary")),
                 tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),
-                         h4("Correlation"),plotOutput("corplot"),h4("Heat Map"),plotOutput("heatmap")),
-                tabPanel("Corr-Hist",h4("Corrlation Heat Map"),plotOutput("heatmap1")),
+                         h4("Correlation"),plotOutput("corplot")),
+                tabPanel("Corr-Hist",h4("Discriptive Analytics"),plotOutput("heatmap1")),
                 tabPanel("Summary OLS", h4("Summary OLS Model"),verbatimTextOutput("olssummary"),
                          h4("Summary OLS standardized model"),
                          verbatimTextOutput("olssummarystd")),
