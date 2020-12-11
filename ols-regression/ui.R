@@ -68,7 +68,8 @@ shinyUI(pageWithSidebar(
                 ),
                 
                 
-                tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),h4("Data Summary"),verbatimTextOutput("summary")),
+                tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
+                         h4("Data Summary"),verbatimTextOutput("summary"),h4("Missing Data Rows"),verbatimTextOutput("missing")),
                 tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),
                          h4("Correlation"),plotOutput("corplot")),
                 tabPanel("Summary OLS", h4("Summary OLS Model"),verbatimTextOutput("olssummary"),

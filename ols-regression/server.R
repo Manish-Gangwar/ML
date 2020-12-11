@@ -92,6 +92,7 @@ Dataset.Predict <- reactive({
 
 out = reactive({
 data = mydata()
+Missing=data[!complete.cases(data),]
 Dimensions = dim(data)
 Head = head(data)
 Tail = tail(data)
@@ -110,7 +111,7 @@ Summary = list(Numeric.data = round(stat.desc(nu.data)[c(4,5,6,8,9,12,13),] ,4),
 
 a = seq(from = 0, to=200,by = 4)
 j = length(which(a < ncol(nu.data)))
-out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j, Head=Head)
+out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j, Head=Head,MissingDataRows=Missing)
 return(out)
 })
 
@@ -125,6 +126,13 @@ output$tail = renderPrint({
   if (is.null(input$file)) {return(NULL)}
   else {
     out()[3]
+  }
+})
+
+output$missing = renderPrint({
+  if (is.null(input$file)) {return(NULL)}
+  else {
+    out()[9]
   }
 })
 
