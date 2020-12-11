@@ -8,6 +8,7 @@ if(!require("Hmisc")){install.packages("Hmisc")}
 if(!require("ggplot2")){install.packages("ggplot2")}
 if(!require("reshape2")){install.packages("reshape2")}
 if (!require("corrplot")) {install.packages("corrplot")}
+if (!require("PerformanceAnalytics")) {install.packages("PerformanceAnalytics")}
 
 library(shiny)
 library(pastecs)
@@ -16,6 +17,7 @@ library(Hmisc)
 library(ggplot2)
 library(reshape2)
 library(corrplot)
+library(PerformanceAnalytics)
 
 # library(gplot)
 
@@ -179,15 +181,29 @@ output$summary = renderPrint({
 # }
 
 output$heatmap = renderPlot({ 
-  
     qplot(x=Var1, y=Var2, data=melt(cor(out()[[5]], use = "pairwise.complete.obs")), fill=value, geom="tile") +
     scale_fill_gradient2(limits=c(-1, 1))
-  
+})
+
+output$heatmap1 = renderPlot({ 
+  my_data = Dataset()
+  chart.Correlation(my_data,hitogram=TRUE)
 })
 
 output$correlation = renderPrint({
   cor(out()[[5]], use = "pairwise.complete.obs")
   })
+
+output$corplot = renderPlot({
+  my_data = Dataset()
+  cor.mat <- round(cor(my_data),2)
+  corrplot(cor.mat, 
+           type = "upper",    # upper triangular form
+           order = "hclust",  # ordered by hclust groups
+           tl.col = "black",  # text label color
+           tl.srt = 45)  
+  
+})
 
 ols = reactive({
     rhs = paste(input$xAttr, collapse = "+")

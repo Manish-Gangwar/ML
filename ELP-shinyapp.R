@@ -23,3 +23,4 @@ try(require("mlogit")||install.packages("mlogit"))
 if (!require("Rfast")) {install.packages("Rfast")}
 if (!require("dplyr")) {install.packages("dplyr")}
 if (!require("multiROC")) {install.packages("multiROC")}
+if (!require("PerformanceAnalytics")) {install.packages("PerformanceAnalytics")}
