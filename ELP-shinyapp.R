@@ -10,7 +10,6 @@ if (!require("nFactors")) {install.packages("nFactors")}
 if (!require("qgraph")) {install.packages("qgraph")}
 if (!require("corrplot")) {install.packages("corrplot")}
 
-
 try(require("caret")||install.packages("caret"))
 try(require("rpart")||install.packages("rpart"))
 try(require("rpart.plot")||install.packages("rpart.plot"))
@@ -20,3 +19,7 @@ try(require("hydroGOF")||install.packages("hydroGOF"))
 try(require("party")||install.packages("party"))
 try(require("partykit")||install.packages("partykit"))
 try(require("mlogit")||install.packages("mlogit"))
+
+if (!require("Rfast")) {install.packages("Rfast")}
+if (!require("dplyr")) {install.packages("dplyr")}
+if (!require("multiROC")) {install.packages("multiROC")}
