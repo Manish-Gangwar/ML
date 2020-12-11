@@ -71,10 +71,10 @@ shinyUI(pageWithSidebar(
                 tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),h4("Data Summary"),verbatimTextOutput("summary")),
                 tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),
                          h4("Correlation"),plotOutput("corplot")),
-                tabPanel("Corr-Hist",h4("Discriptive Analytics"),plotOutput("heatmap1")),
                 tabPanel("Summary OLS", h4("Summary OLS Model"),verbatimTextOutput("olssummary"),
                          h4("Summary OLS standardized model"),
                          verbatimTextOutput("olssummarystd")),
+                tabPanel("Corr-Hist",h4("Discriptive Analytics"),plotOutput("heatmap1")),
                 tabPanel("Residuals Plot",h4("Fitted Values vs Residuals"),
                          plotOutput("resplot2"),h4("Fitted Values vs Y"),
                          plotOutput("resplot3"),h4("Residuals plot"),
@@ -85,8 +85,7 @@ shinyUI(pageWithSidebar(
                          p('"Yhat" column is the predicted value.'),
                          verbatimTextOutput('prediction'),
                          h4("Download Predicted data"),
-                         downloadButton('downloadData1', 'Download Predicted data (Works only in browser)')
-                )                
+                         downloadButton('downloadData1', 'Download Predicted data (Works only in browser)')      )                
 
                 )
       ) 
