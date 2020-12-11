@@ -110,8 +110,22 @@ Summary = list(Numeric.data = round(stat.desc(nu.data)[c(4,5,6,8,9,12,13),] ,4),
 
 a = seq(from = 0, to=200,by = 4)
 j = length(which(a < ncol(nu.data)))
-out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j)
+out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j, Head=Head)
 return(out)
+})
+
+output$head = renderPrint({
+  if (is.null(input$file)) {return(NULL)}
+  else {
+    out()[8]
+  }
+})
+
+output$tail = renderPrint({
+  if (is.null(input$file)) {return(NULL)}
+  else {
+    out()[3]
+  }
 })
 
 output$summary = renderPrint({

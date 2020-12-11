@@ -68,7 +68,7 @@ shinyUI(pageWithSidebar(
                 ),
                 
                 
-                tabPanel("Summary Stats", verbatimTextOutput("summary")),
+                tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),h4("Data Summary"),verbatimTextOutput("summary")),
                 tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),
                          h4("Correlation"),plotOutput("corplot")),
                 tabPanel("Corr-Hist",h4("Discriptive Analytics"),plotOutput("heatmap1")),
