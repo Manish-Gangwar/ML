@@ -186,7 +186,7 @@ output$heatmap = renderPlot({
 })
 
 output$heatmap1 = renderPlot({ 
-  my_data = Dataset()
+  my_data = out()[[5]]
   chart.Correlation(my_data,hitogram=TRUE)
 })
 
@@ -195,7 +195,7 @@ output$correlation = renderPrint({
   })
 
 output$corplot = renderPlot({
-  my_data = Dataset()
+  my_data = out()[[5]]
   cor.mat <- round(cor(my_data),2)
   corrplot(cor.mat, 
            type = "upper",    # upper triangular form
