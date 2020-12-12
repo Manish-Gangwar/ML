@@ -15,7 +15,7 @@ shinyUI(
         fileInput("file", "Upload Model Training data in csv"),
         sliderInput('sample','Validation Sample Proportion',10,50,30),
         # h4(p("Select Response Variable")),
-        sliderInput('cp','Complexity Parameter',0,1,0.01),
+        sliderInput('cp','Complexity Parameter',0,0.5,0.005),
         fileInput("filep", "Upload Prediction data in csv"),
         htmlOutput("yvarselect"),
         htmlOutput("xvarselect"),
@@ -33,8 +33,9 @@ shinyUI(
                             dependent variable (Y Variable) from drop-down menu. By default all other remaining variables will be selected as explanatory variables (X variables). 
                               If you want to drop any variable from explanatory variables, just uncheck that variable and it will be dropped from the model.
                             ",align="justify"),
-                             p('You can also adjust the complexity parameter in regression tree model. Default value of complexity parameter is "0.01". You can adjust the validation sample proportion from the slider in left sidebar panel. Validation sample will be selected from the input data set. If you have a similar data set on which you want to make the prediction based on regression tree, You can upload that data set in left side bar panel. Please note that prediction data should have all explanatory variables similar to model data.',align="justify"),
+                             p('You can adjust the validation sample proportion from the slider in left sidebar panel. Validation sample will be selected from the input data set. If you have a similar data set on which you want to make the prediction based on regression tree, You can upload that data set in left side bar panel. Please note that prediction data should have all explanatory variables similar to model data.',align="justify"),
                              ),
+                            p('You can also adjust the complexity parameter in regression tree model.'),
                     #tabPanel("Data Summary",verbatimTextOutput('summarydata')),
                     tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
                             h4("Data Summary"),verbatimTextOutput("summarydata"),h4("Missing Data Rows"),verbatimTextOutput("missing")),
