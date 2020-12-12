@@ -5,6 +5,7 @@ suppressPackageStartupMessages({
   try(require("shiny")||install.packages("shiny"))
   try(require("pastecs")||install.packages("pastecs"))
   try(require("rpart")||install.packages("rpart"))
+  try(require("rpart.plot")||install.packages("rpart.plot"))
   try(require("dplyr")||install.packages("dplyr"))
   try(require("Hmisc")||install.packages("Hmisc"))
   #try(require("hydroGOF")||install.packages("hydroGOF"))
@@ -15,6 +16,7 @@ suppressPackageStartupMessages({
 
 library(shiny)
 library(rpart)
+library(rpart.plot)
 library(pastecs)
 library(dplyr)
 library(Hmisc)
@@ -48,7 +50,7 @@ shinyServer(function(input, output,session) {
   output$yvarselect <- renderUI({
     if (is.null(input$file)) {return(NULL)}
     
-    selectInput("yAttr", "Select Y variable",
+    selectInput("yAttr", "Select Y variable - if it is factor variable check mark it as Factor variable",
                 colnames(readdata()), colnames(readdata())[1])
     
   })
@@ -69,7 +71,7 @@ shinyServer(function(input, output,session) {
   output$fxvarselect <- renderUI({
     if (identical(readdata.temp(), '') || identical(readdata.temp(),data.frame())) return(NULL)
     
-    checkboxGroupInput("fxAttr", "Select factor variable in Data set",
+    checkboxGroupInput("fxAttr", "Factor variable in Data set",
                        colnames(readdata.temp()) )
     
   })
@@ -107,6 +109,7 @@ shinyServer(function(input, output,session) {
   
   out = reactive({
     data = Dataset()
+    Missing=data[!complete.cases(data),]
     Dimensions = dim(data)
     Head = head(data)
     Tail = tail(data)
@@ -124,7 +127,7 @@ shinyServer(function(input, output,session) {
     
     a = seq(from = 0, to=200,by = 4)
     j = length(which(a < ncol(nu.data)))
-    out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j)
+    out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j, Head=Head, MissingDataRows=Missing)
     return(out)
   })
   
@@ -134,6 +137,28 @@ shinyServer(function(input, output,session) {
       out()[1:2]
     }
   })
+  
+  output$head = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      out()[8]
+    }
+  })
+  
+  output$tail = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      out()[3]
+    }
+  })
+  
+  output$missing = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      out()[9]
+    }
+  })
+  
   
   testsample =  reactive({
   set.seed(5898)
@@ -247,7 +272,7 @@ shinyServer(function(input, output,session) {
     
     # create attractive postcript plot of tree 
     post(fit.rt1, 
-         # file = "tree2.ps", 
+         #file = "tree2.ps", 
          filename = "",   # will print to console
          use.n = FALSE,
          compress = TRUE,
@@ -290,9 +315,22 @@ shinyServer(function(input, output,session) {
   
   })
 
-  output$nodesout = renderPrint({
+  output$nodesout1 = renderPrint({
     head(nodes1(),15)
   })
+  
+  output$nodesout <- renderDataTable({  	
+    data.frame(nodes1(), train_data())
+  }, options = list(lengthMenu = c(10, 30, 50), pageLength = 100))  # my edits here
+  
+  output$downloadData3 <- downloadHandler(
+    filename = function() { "Nodes Info.csv" },
+    content = function(file) {
+      if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+      dft = data.frame(nodes1(), train_data());   # data.frame(row_numer = row.names(nodes1()), nodes1())
+      write.csv(dft, file, row.names=F, col.names=F)
+    }
+  )
   
   output$downloadData3 <- downloadHandler(
     filename = function() { "Nodes Info.csv" },

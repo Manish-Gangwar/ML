@@ -148,7 +148,7 @@ shinyServer(function(input, output,session) {
   
   
   #------------------------------------------------#
-  #----------Random classification tree------------#
+  #---------- classification tree------------#
   #------------------------------------------------#
   fit.rt = reactive({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
@@ -182,7 +182,7 @@ shinyServer(function(input, output,session) {
     })
 
   #------------------------------------------------------#
-  #-------------Random forest trees----------------------#
+  #------------- Regression trees----------------------#
   #------------------------------------------------------#
   
   fit.rf = reactive({
@@ -297,7 +297,7 @@ shinyServer(function(input, output,session) {
   output$plot4 = renderPlot({
     if (is.null(input$file)) {return(NULL)}
     
-    title1 = paste("Random forest for", input$yAttr)
+    title1 = paste("Regression Tree for", input$yAttr)
     varImpPlot(fit.rf()$model,type = 1)
     
     # confusionMatrix(fit.rf$validation,test_data()[,c(input$yAttr)])
