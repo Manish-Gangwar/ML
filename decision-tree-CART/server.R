@@ -8,7 +8,7 @@ suppressPackageStartupMessages({
   try(require("rpart.plot")||install.packages("rpart.plot"))
   try(require("dplyr")||install.packages("dplyr"))
   try(require("Hmisc")||install.packages("Hmisc"))
-  #try(require("hydroGOF")||install.packages("hydroGOF"))
+  try(require("hydroGOF")||install.packages("hydroGOF"))
   try(require("party")||install.packages("party"))
   try(require("partykit")||install.packages("partykit"))
 })
@@ -20,7 +20,7 @@ library(rpart.plot)
 library(pastecs)
 library(dplyr)
 library(Hmisc)
-#library(hydroGOF)
+library(hydroGOF)
 require(party)
 require(partykit)
 
@@ -50,7 +50,7 @@ shinyServer(function(input, output,session) {
   output$yvarselect <- renderUI({
     if (is.null(input$file)) {return(NULL)}
     
-    selectInput("yAttr", "Select Y variable - if it is factor variable check mark it as Factor variable",
+    selectInput("yAttr", "Select Y variable (If it is a factor variable mark it as Factor variable)",
                 colnames(readdata()), colnames(readdata())[1])
     
   })
@@ -71,7 +71,7 @@ shinyServer(function(input, output,session) {
   output$fxvarselect <- renderUI({
     if (identical(readdata.temp(), '') || identical(readdata.temp(),data.frame())) return(NULL)
     
-    checkboxGroupInput("fxAttr", "Factor variable in Data set",
+    checkboxGroupInput("fxAttr", "Factor variables",
                        colnames(readdata.temp()) )
     
   })
