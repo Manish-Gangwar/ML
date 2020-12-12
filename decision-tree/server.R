@@ -1,5 +1,5 @@
 ###########################################################
-#         Regression Tree App (server)              #
+#         Decision Tree App (server)              #
 ###########################################################
 suppressPackageStartupMessages({
   try(require("shiny")||install.packages("shiny"))

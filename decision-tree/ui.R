@@ -1,8 +1,8 @@
 ###########################################################
-#           Regression Tree App (ui)                #
+#           Decision Tree App (ui)                #
 ###########################################################
 library("shiny")
-# library("randomForest")
+library("randomForest")
 
 shinyUI(
   fluidPage(
@@ -89,7 +89,7 @@ h5('month    =    month number 1 to 12'),
                              br(),
                              downloadButton('downloadData3','Download nodes data (Works only in browser)')
                              ),
-                    # tabPanel("Random Forest",verbatimTextOutput('rfimp')),
+                    #tabPanel("Random Forest",verbatimTextOutput('rfimp')),
                     tabPanel("Prediction",br(),
                              h4("First 10 rows of predicted data"),
                              p('"Yhat" column is the predicted value.'),

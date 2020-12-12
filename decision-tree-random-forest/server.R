@@ -1,5 +1,5 @@
 ###########################################################
-#         Regression Tree App (server)              #
+#   Decision Tree App (server)          #
 ###########################################################
 try(require("shiny")||install.packages("shiny"))
 try(require("pastecs")||install.packages("pastecs"))
