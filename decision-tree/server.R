@@ -1,18 +1,14 @@
 ###########################################################
-#         Decision Tree App (server)              #
+#   Decision Tree App (server)          #
 ###########################################################
-suppressPackageStartupMessages({
-  try(require("shiny")||install.packages("shiny"))
-  try(require("pastecs")||install.packages("pastecs"))
-  try(require("rpart")||install.packages("rpart"))
-  try(require("dplyr")||install.packages("dplyr"))
-  try(require("Hmisc")||install.packages("Hmisc"))
-  try(require("randomForest")||install.packages("randomForest"))
-  try(require("hydroGOF")||install.packages("hydroGOF"))
-  
-  try(require("party")||install.packages("party"))
-  try(require("partykit")||install.packages("partykit"))
-})
+try(require("shiny")||install.packages("shiny"))
+try(require("pastecs")||install.packages("pastecs"))
+try(require("rpart")||install.packages("rpart"))
+try(require("rpart.plot")||install.packages("rpart.plot"))
+try(require("dplyr")||install.packages("dplyr"))
+try(require("Hmisc")||install.packages("Hmisc"))
+try(require("party")||install.packages("party"))
+try(require("partykit")||install.packages("partykit"))
 
 
 library(shiny)
@@ -20,9 +16,9 @@ library(rpart)
 library(pastecs)
 library(dplyr)
 library(Hmisc)
-library("hydroGOF")
 require(party)
 require(partykit)
+
 
 shinyServer(function(input, output,session) {
   
@@ -152,15 +148,14 @@ shinyServer(function(input, output,session) {
   
   
   #------------------------------------------------#
+  #----------Random classification tree------------#
+  #------------------------------------------------#
   fit.rt = reactive({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
   x = setdiff(colnames(Dataset()), input$Attr)
   y = input$yAttr
-  # formula1 = 
-  
-  
-  
+  # formula1 =
   ## mean predictions
   
   if (class(train_data()[,c(input$yAttr)]) == "factor"){
@@ -186,6 +181,32 @@ shinyServer(function(input, output,session) {
   out = list(model = fit.rt, validation = val, imp = imp)
     })
 
+  #------------------------------------------------------#
+  #-------------Random forest trees----------------------#
+  #------------------------------------------------------#
+  
+  fit.rf = reactive({
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    x = setdiff(colnames(Dataset()), input$Attr)
+    y = input$yAttr
+    # formula1 = 
+    ## mean predictions
+    
+    if (class(train_data()[,c(input$yAttr)]) == "factor"){
+      fit.randf <- randomForest(as.factor(train_data()[,c(input$yAttr)]) ~ .,train_data(),ntree = 500,mtry = 4,nodesize = 5,importance = TRUE)
+      print(class(fit.randf))
+      val <- predict(fit.randf,test_data())
+    } else {
+      fit.randf <- randomForest(as.factor(train_data()[,c(input$yAttr)]) ~ .,train_data(),ntree = 500,mtry = 4,nodesize = 5,importance = TRUE)
+      print(class(fit.randf))
+      val <- predict(fit.randf,test_data())
+    }
+    
+    out <- list(model = fit.randf,validation = val)
+    return(out)
+  })
+  #------------------------------------------------------#
   output$validation = renderPrint({
     if (is.null(input$file)) {return(NULL)}
     
@@ -243,16 +264,18 @@ shinyServer(function(input, output,session) {
     
     title1 = paste("Decision Nodes for", input$yAttr)
     
-    fit.rt1 = fit.rt()$model
-    fit.rt1$frame$yval = as.numeric(rownames(fit.rt()$model$frame))
+    fit.rt1 = fit.rt()$model     
+    fit.rt1$frame$yval = as.numeric(rownames(fit.rt()$model$frame))    
     
     # create attractive postcript plot of tree 
-    post(fit.rt1, 
-         # file = "tree2.ps", 
-         filename = "",   # will print to console
-         use.n = FALSE,
-         compress = TRUE,
-         title = title1) 
+    prp(fit.rt1,type=1,extra=1,under=TRUE,split.font=1,varlen=-10)
+    
+    # post(fit.rt1, 
+    #      # file = "tree2.ps", 
+    #      filename = "",   # will print to console
+    #      use.n = FALSE,
+    #      compress = TRUE,
+    #      title = title1) 
     
   })
   
@@ -261,12 +284,31 @@ shinyServer(function(input, output,session) {
     
     title1 = paste("Decision Tree for", input$yAttr)
     
-  post(fit.rt()$model, 
-       # file = "tree2.ps", 
-       filename = "",   # will print to console
-       use.n = TRUE,
-       compress = TRUE,
-       title = title1) 
+    prp(fit.rt()$model,type=1,extra=1,under=TRUE,split.font=1,varlen=-10)
+    
+  # post(fit.rt()$model, 
+  #      # file = "tree2.ps", 
+  #      filename = "",   # will print to console
+  #      use.n = TRUE,
+  #      compress = TRUE,
+  #      title = title1) 
+  })
+  
+  output$plot4 = renderPlot({
+    if (is.null(input$file)) {return(NULL)}
+    
+    title1 = paste("Random forest for", input$yAttr)
+    varImpPlot(fit.rf()$model,type = 1)
+    
+    # confusionMatrix(fit.rf$validation,test_data()[,c(input$yAttr)])
+    
+    
+    # post(fit.rt()$model, 
+    #      # file = "tree2.ps", 
+    #      filename = "",   # will print to console
+    #      use.n = TRUE,
+    #      compress = TRUE,
+    #      title = title1) 
   })
   
   
@@ -291,15 +333,23 @@ shinyServer(function(input, output,session) {
   
   })
 
-  output$nodesout = renderPrint({
-    head(nodes1(),15)
-  })
+  # my edits below
+  # output$nodesout = renderPrint({
+  #  head(nodes1(),15)
+  # })
   
+ #  output$nodesout = renderTable({
+ #   head(data.frame(nodes1(), train_data()), min(50, nrow(train_data())))     })
+
+output$nodesout <- renderDataTable({  	
+       data.frame(nodes1(), train_data())
+	}, options = list(lengthMenu = c(10, 30, 50), pageLength = 100))  # my edits here
+	  
   output$downloadData3 <- downloadHandler(
     filename = function() { "Nodes Info.csv" },
     content = function(file) {
       if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-      dft = data.frame(row_numer = row.names(nodes1()), nodes1())
+      dft = data.frame(nodes1(), train_data());   # data.frame(row_numer = row.names(nodes1()), nodes1())
       write.csv(dft, file, row.names=F, col.names=F)
     }
   )

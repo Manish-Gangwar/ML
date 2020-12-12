@@ -1,13 +1,11 @@
 ###########################################################
-#           Decision Tree App (ui)                #
+#                    Decision Tree App (ui)               #
 ###########################################################
-library("shiny")
-library("randomForest")
 
 shinyUI(
   fluidPage(
     
-    titlePanel("Regression Tree"),
+    titlePanel("Decision Tree"),
     
     sidebarLayout(
       
@@ -80,16 +78,23 @@ h5('month    =    month number 1 to 12'),
                              # plotOutput("plot1",height = 600, width = 850),
                              # h4('Regression Tree'),
                              plotOutput("plot3",height = 600, width = 850)),
+                    tabPanel("Random Forest",
+                             # h4('Visualize cross-validation results'),
+                             # plotOutput("plot1",height = 600, width = 850),
+                             # h4('Regression Tree'),
+                             plotOutput("plot4",height = 600, width = 850)),
+                    
                     tabPanel("Node labels",
                              plotOutput("plot2",height = 600, width = 850),
-                             h4("First 15 rows node number from model training data"),
-                             verbatimTextOutput("nodesout"),
+                             h4("First column is assigned node number for each obsrvn in model training data"),
+                             # verbatimTextOutput("nodesout"),
+                             dataTableOutput("nodesout"),
                              br(),
                              h4("Download nodes data from model training data"),
                              br(),
                              downloadButton('downloadData3','Download nodes data (Works only in browser)')
                              ),
-                    #tabPanel("Random Forest",verbatimTextOutput('rfimp')),
+                    
                     tabPanel("Prediction",br(),
                              h4("First 10 rows of predicted data"),
                              p('"Yhat" column is the predicted value.'),
