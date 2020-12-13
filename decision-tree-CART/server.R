@@ -285,7 +285,7 @@ shinyServer(function(input, output,session) {
     
     title1 = paste("Decision Tree for", input$yAttr)
     
-  post(fit.rt()$model, 
+  post((fit.rt()$model), 
        # file = "tree2.ps", 
        filename = "",   # will print to console
        use.n = TRUE,
