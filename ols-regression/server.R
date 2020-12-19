@@ -292,6 +292,10 @@ output$datatable = renderTable({
   data.frame(Y.hat,mydata())
 })
 
+inputprediction = reactive({
+  val = predict(ols(),Dataset())
+  out = data.frame(Yhat = val, Dataset())
+})
 
 prediction = reactive({
   val = predict(ols(),Dataset.Predict())
@@ -315,6 +319,13 @@ output$downloadData <- downloadHandler(
   filename = function() { "califhouse.csv" },
   content = function(file) {
     write.csv(read.csv("data/califhouse.csv"), file, row.names=F, col.names=F)
+  }
+)
+output$downloadData2 <- downloadHandler(
+  filename = function() { "Input Data With Prediction.csv" },
+  content = function(file) {
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    write.csv(inputprediction(), file, row.names=F, col.names=F)
   }
 )
 

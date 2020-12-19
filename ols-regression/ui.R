@@ -45,28 +45,27 @@ shinyUI(pageWithSidebar(
                          br(),
                          p("Please note that download will not work with RStudio interface. Download will work only in web-browsers. So open this app in a web-browser and then download the example file."),
                          ),
-                
-                
                 tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
                          h4("Data Summary"),verbatimTextOutput("summary"),h4("Missing Data Rows"),verbatimTextOutput("missing")),
-                tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),
-                         h4("Correlation"),plotOutput("corplot")),
                 tabPanel("Summary OLS", h4("Summary OLS Model"),verbatimTextOutput("olssummary"),
                          h4("Summary OLS standardized model"),
                          verbatimTextOutput("olssummarystd")),
-                tabPanel("Corr-Hist",h4("Discriptive Analytics"),plotOutput("heatmap1")),
-                tabPanel("Residuals Plot",h4("Fitted Values vs Residuals"),
-                         plotOutput("resplot2"),h4("Fitted Values vs Y"),
-                         plotOutput("resplot3"),h4("Residuals plot"),
+                tabPanel("Data with predicted Y", h4("Download Input Data with Predicted Y"),
+                         downloadButton('downloadData2', 'Download data (Works only in browser)'),
+                         br(),br(),tableOutput("datatable")),
+                tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
+                         h4("Correlation Visulization - Input Data"),plotOutput("corplot")),
+                tabPanel("Corr-Hist",h4("Discriptive Analytics - Input Data"),plotOutput("heatmap1")),
+                tabPanel("Residuals Plot",h4("Fitted Values vs Residuals - Input Data"),
+                         plotOutput("resplot2"),h4("Fitted Values vs Y - Input Data"),
+                         plotOutput("resplot3"),h4("Residuals plot - Input Data"),
                          plotOutput("resplot1")),
-                tabPanel("Data with predicted Y",tableOutput("datatable")),
-                tabPanel("Prediction",br(),
-                         h4("First 10 rows of predicted data"),
+                tabPanel("Prediction New Data",br(),
+                         h4("First 10 rows of predicted data (upload prediction data)"),
                          p('"Yhat" column is the predicted value.'),
                          verbatimTextOutput('prediction'),
                          h4("Download Predicted data"),
-                         downloadButton('downloadData1', 'Download Predicted data (Works only in browser)')      )                
-
+                         downloadButton('downloadData1', 'Download data (Works only in browser)')      ) 
                 )
       ) 
     ) 
