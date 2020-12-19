@@ -40,10 +40,10 @@ shinyUI(pageWithSidebar(
                          br(),
                          h4(p("Download Sample Input Files")),
                          # br(),
-                         downloadButton('downloadData', 'Download model training input file (works only in browsers)'),
+                         downloadButton('downloadData', 'Download Sample Data (works only in browsers)'),
                          br(),
                          br(),
-                         p("Please note that download will not work with RStudio interface. Download will work only in web-browsers. So open this app in a web-browser and then download the example file."),
+                         p("*Please note that download will not work with RStudio interface. Download will work only in web-browsers."),
                          ),
                 tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
                          h4("Data Summary"),verbatimTextOutput("summary"),h4("Missing Data Rows"),verbatimTextOutput("missing")),
@@ -51,7 +51,7 @@ shinyUI(pageWithSidebar(
                          h4("Summary OLS standardized model"),
                          verbatimTextOutput("olssummarystd")),
                 tabPanel("Data with predicted Y", h4("Download Input Data with Predicted Y"),
-                         downloadButton('downloadData2', 'Download data (Works only in browser)'),
+                         downloadButton('downloadData2', 'Download Data (Works only in browser)'),
                          br(),br(),tableOutput("datatable")),
                 tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
                          h4("Correlation Visulization - Input Data"),plotOutput("corplot")),
@@ -64,7 +64,7 @@ shinyUI(pageWithSidebar(
                          h4("First 10 rows of predicted data (upload prediction data)"),
                          p('"Yhat" column is the predicted value.'),
                          verbatimTextOutput('prediction'),
-                         h4("Download Predicted data"),
+                         h4("Download Predicted Data"),
                          downloadButton('downloadData1', 'Download data (Works only in browser)')      ) 
                 )
       ) 
