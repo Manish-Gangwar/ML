@@ -312,16 +312,9 @@ output$downloadData1 <- downloadHandler(
   }
 )
 output$downloadData <- downloadHandler(
-  filename = function() { "beer data.csv" },
+  filename = function() { "califhouse.csv" },
   content = function(file) {
-    write.csv(read.csv("data/beer data.csv"), file, row.names=F, col.names=F)
-  }
-)
-
-output$downloadData2 <- downloadHandler(
-  filename = function() { "beer data - prediction sample.csv" },
-  content = function(file) {
-    write.csv(read.csv("data/beer data - prediction sample.csv"), file, row.names=F, col.names=F)
+    write.csv(read.csv("data/califhouse.csv"), file, row.names=F, col.names=F)
   }
 )
 
