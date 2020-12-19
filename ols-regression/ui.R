@@ -55,7 +55,7 @@ shinyUI(pageWithSidebar(
                          br(),br(),tableOutput("datatable")),
                 tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
                          h4("Correlation Visulization - Input Data"),plotOutput("corplot")),
-                tabPanel("Corr-Hist",h4("Discriptive Analytics - Input Data"),plotOutput("heatmap1")),
+                tabPanel("Corr-Hist",h4("Discriptive Analytics - Random 100 Input Data Rows"),plotOutput("heatmap1")),
                 tabPanel("Residuals Plot",h4("Fitted Values vs Residuals - Input Data"),
                          plotOutput("resplot2"),h4("Fitted Values vs Y - Input Data"),
                          plotOutput("resplot3"),h4("Residuals plot - Input Data"),

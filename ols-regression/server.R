@@ -211,9 +211,18 @@ output$heatmap = renderPlot({
     scale_fill_gradient2(limits=c(-1, 1))
 })
 
-output$heatmap1 = renderPlot({ 
+plotsample =  reactive({
+  sample(1:nrow(mydata()), round( if (nrow(mydata()>100)) {100} else {nrow(mydata())}  ))
+})
+
+plot_data = reactive({
   my_data = out()[[5]]
-  chart.Correlation(my_data,hitogram=TRUE)
+  my_data[plotsample(),]
+})
+
+
+output$heatmap1 = renderPlot({ 
+  chart.Correlation(plot_data(),hitogram=TRUE)
 })
 
 output$correlation = renderPrint({
