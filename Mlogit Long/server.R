@@ -86,17 +86,6 @@ library(multiROC)
 
   })
 
-  mydata = reactive({
-    mydata = Dataset()[,c(input$ChoiceAttr,input$AlternativesAttr,input$AlternativefeaturesAttr,input$IndividualfeaturesAttr,input$IndividualAttr)]
-    
-    
-        mydata[,input$AlternativesAttr] = as.factor(mydata[,input$AlternativesAttr])
-        mydata[,input$ChoiceAttr] = as.factor(mydata[,input$ChoiceAttr])
-        mydata[,input$IndividualAttr]=as.factor(mydata[,input$IndividualAttr])
-    return(mydata)
-    
-  })
-  
   out = reactive({
     data = Dataset()
     Missing=data[!complete.cases(data),]
@@ -154,20 +143,7 @@ library(multiROC)
       out()[1:2]
     }
   })
-  output$correlation = renderPrint({
-    cor(out()[[5]], use = "pairwise.complete.obs")
-  })
-  
-  output$corplot = renderPlot({
-    my_data = out()[[5]]
-    cor.mat <- round(cor(my_data),2)
-    corrplot(cor.mat, 
-             type = "upper",    # upper triangular form
-             order = "hclust",  # ordered by hclust groups
-             tl.col = "black",  # text label color
-             tl.srt = 45)  
-    
-  })
+
   
   # mydata2 = reactive({
   #   H=dfidx(Dataset(),choice = input$yAttr,varying = input$xAttr)
