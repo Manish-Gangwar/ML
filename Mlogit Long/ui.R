@@ -12,7 +12,7 @@ library("shiny")
 shinyUI(pageWithSidebar(
   # Header:
   
-  headerPanel(title=div(img(src="isb.png",  height = 50, width = 100,align = "right"),
+  headerPanel(title=div(img(src="isb.png",align = "right"),
                                       h3("Multinomial Logit App", style="bold")
   )),
   
