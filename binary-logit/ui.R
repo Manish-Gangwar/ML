@@ -1,5 +1,5 @@
 ####################################################
-#      Summary & OLS App                           #
+#      Summary & GLM App                           #
 ####################################################
 
 library("shiny")
@@ -7,9 +7,8 @@ library("shiny")
 
 shinyUI(pageWithSidebar(
   # Header:
- # headerPanel("Regression App"),
-  headerPanel(title=div(img(src="isb.png",align = "right"), h2("Regression App", style="bold"))),
-  
+  #headerPanel("Binary Logit App"),
+  headerPanel(title=div(img(src="isb.png",align = "right"), h2("Binary Logit App", style="bold"))),
   # Input in sidepanel:
   sidebarPanel(
 
@@ -47,21 +46,21 @@ shinyUI(pageWithSidebar(
                          br(),
                          p("*Please note that download will not work with RStudio interface. Download will work only in web-browsers."),
                          ),
-                tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
+                tabPanel("Data Summary",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
                          h4("Data Summary"),verbatimTextOutput("summary"),h4("Missing Data Rows"),verbatimTextOutput("missing")),
-                tabPanel("Summary OLS", h4("Summary OLS Model"),verbatimTextOutput("olssummary"),
-                         h4("Summary OLS standardized model"),
-                         verbatimTextOutput("olssummarystd")),
+                tabPanel("Summary Logit", h4('Confusion Matrix'), verbatimTextOutput("validation"),
+                         h4("Summary Logit Model"),verbatimTextOutput("olssummary")),
+                         #h4("Summary OLS standardized model"), verbatimTextOutput("olssummarystd")),
                 tabPanel("Data with predicted Y", h4("Download Input Data with Predicted Y"),
                          downloadButton('downloadData2', 'Download Data (Works only in browser)'),
                          br(),br(),tableOutput("datatable")),
-                tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
-                         h4("Correlation Visulization - Input Data"),plotOutput("corplot")),
-                tabPanel("Corr-Hist",h4("Discriptive Analytics - Random 100 Input Data Rows"),plotOutput("heatmap1")),
-                tabPanel("Residuals Plot",h4("Fitted Values vs Residuals - Input Data"),
-                         plotOutput("resplot2"),h4("Fitted Values vs Y - Input Data"),
-                         plotOutput("resplot3"),h4("Residuals plot - Input Data"),
-                         plotOutput("resplot1")),
+               # tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
+               #          h4("Correlation Visulization - Input Data"),plotOutput("corplot")),
+                tabPanel("ROC", h4("Confusion Matrix Summary"),verbatimTextOutput("confusionmatrix"),
+                         h4("ROC Curve"),plotOutput("roc")),
+                tabPanel("Residuals Plot",
+                      #   h4("Fitted Values vs Residuals - Input Data"), plotOutput("resplot2"),
+                         h4("Fitted Values vs Y - Input Data"), plotOutput("resplot3")),
                 tabPanel("Prediction New Data",br(),
                          h4("First 10 rows of predicted data (upload prediction data)"),
                          p('"Yhat" column is the predicted value.'),
