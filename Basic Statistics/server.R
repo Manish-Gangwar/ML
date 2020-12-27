@@ -140,7 +140,7 @@ output$heatmap = renderPlot({
 })
 
 plotsample =  reactive({
-  sample(1:nrow(mydata()), round( if (nrow(mydata()>200)) {200} else {nrow(mydata())}  ))
+  sample(1:nrow(mydata()), round( if (nrow(mydata()>500)) {500} else {nrow(mydata())}  ))
 })
 
 plot_data = reactive({

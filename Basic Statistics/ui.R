@@ -8,7 +8,7 @@ library("shiny")
 shinyUI(pageWithSidebar(
   # Header:
  # headerPanel("Regression App"),
-  headerPanel(title=div(img(src="isb.png",align = "right"), h2("Basic Stats App", style="bold"))),
+  headerPanel(title=div(img(src="isb.png",align = "right"), h2("Basic Data Stats App", style="bold"))),
   
   # Input in sidepanel:
   sidebarPanel(
@@ -52,7 +52,7 @@ shinyUI(pageWithSidebar(
                 tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),
                          h4("Correlation Visulization"),plotOutput("corplot")),
                 tabPanel("Box Plot", h4("Box Plots"),plotOutput("bplot")),
-                tabPanel("Data Visulization",h4("Discriptive Analytics (randomly selected 200 input data rows - If less than 200 rows in dataset, select whole dataset)"),plotOutput("heatmap1")),
+                tabPanel("Data Visulization",h4("Discriptive Analytics (randomly selected 500 input data rows - If less than 500 rows in dataset, select whole dataset)"),plotOutput("heatmap1")),
                 tabPanel("Outliers", h4("selcet a variable in the left tab at the bottom, to test for Rosner's outliers in a selected varaible"),verbatimTextOutput("outlier"))
                 )
       ) 
