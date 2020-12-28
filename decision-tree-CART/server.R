@@ -71,7 +71,7 @@ shinyServer(function(input, output,session) {
   output$fxvarselect <- renderUI({
     if (identical(readdata.temp(), '') || identical(readdata.temp(),data.frame())) return(NULL)
     
-    checkboxGroupInput("fxAttr", "Factor variables",
+    checkboxGroupInput("fxAttr", "Select factor variables",
                        colnames(readdata.temp()) )
     
   })
@@ -321,7 +321,7 @@ shinyServer(function(input, output,session) {
   
   output$nodesout <- renderDataTable({  	
     data.frame(nodes1(), train_data())
-  }, options = list(lengthMenu = c(10, 30, 50), pageLength = 100))  # my edits here
+  }, options = list(lengthMenu = c(10, 30, 50, 100), pageLength = 10))  # my edits here
   
   output$downloadData3 <- downloadHandler(
     filename = function() { "Nodes Info.csv" },
@@ -375,16 +375,9 @@ shinyServer(function(input, output,session) {
     }
   )
   output$downloadData <- downloadHandler(
-    filename = function() { "beer data.csv" },
+    filename = function() { "mTitanicAll.csv" },
     content = function(file) {
-      write.csv(read.csv("data/beer data.csv"), file, row.names=F, col.names=F)
-    }
-  )
-  
-  output$downloadData2 <- downloadHandler(
-    filename = function() { "beer data - prediction sample.csv" },
-    content = function(file) {
-      write.csv(read.csv("data/beer data - prediction sample.csv"), file, row.names=F, col.names=F)
+      write.csv(read.csv("data/mTitanicAll.csv"), file, row.names=F, col.names=F)
     }
   )
   
