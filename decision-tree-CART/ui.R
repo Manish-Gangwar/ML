@@ -42,7 +42,7 @@ shinyUI(
                         h4(p("Download Sample Input Files")),
                         downloadButton('downloadData', 'Download Sample Data (works only in browsers)'),
                         br(), br(),
-                    p("*Please note that download will not work with RStudio interface. Download will work only in web-browsers."),
+                    p("*Please note that download will not work with RStudio interface. Download will work only in web-browsers.")
                       ), # close Overview tab
                     #tabPanel("Data Summary",verbatimTextOutput('summarydata')),
                     tabPanel("Data Summary",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
