@@ -57,7 +57,7 @@ shinyUI(
                     tabPanel('Detailed summary of splits',verbatimTextOutput("summary")),
                     tabPanel("Decision Tree",
                              # h4('Regression Tree'),
-                             plotOutput("plot3",height = 600, width = 850),
+                             plotOutput("plot3",height = 1100),
                      #        h4('Visualize cross-validation results'),
                       #       plotOutput("plot1",height = 600, width = 850)
                              ),                   
