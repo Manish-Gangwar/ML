@@ -258,8 +258,8 @@ output$validation = renderPrint({
     y = Dataset()[,input$yAttr]
     yhat = as.integer(ols()$fitted.values>0.5)
     confusion_matrix = table(y,yhat)
-    accuracy = (sum(diag(confusion_matrix))/sum(confusion_matrix))*100
-    out = list(Confusion_matrix_of_Validation = confusion_matrix, Accuracy_of_Validation = accuracy)
+    accuracy = (sum(diag(confusion_matrix))/sum(confusion_matrix))
+    out = list(Confusion_matrix_of_Validation = confusion_matrix, Percentage_Accuracy_Hit_Rate = accuracy)
     out
 })
 
