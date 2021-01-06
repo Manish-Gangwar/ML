@@ -18,14 +18,13 @@ shinyUI(pageWithSidebar(
   sidebarPanel(
     h5(p("Data Input")),
     fileInput("file", "Upload input data (csv file with header)"),
-    #fileInput("filep", "Upload prediction data (csv file with header)"),
     h5(p("Data Selection")),
     htmlOutput("Choicevarselect"),
     htmlOutput("Individualvarselect"),
     htmlOutput("Alternativesvarselect"),
     htmlOutput("Alternativefeaturesvarselect"),
     htmlOutput("Individualfeaturesvarselect"),
-    
+    fileInput("filep", "Upload prediction data (csv file with header)"),
     br()
   ),
   # Main:
@@ -63,9 +62,8 @@ shinyUI(pageWithSidebar(
                 #          ))
                           br(),
                           p("Please note that download will not work with RStudio interface. 
-                            Download will work only in web-browsers. So open this app in a web-browser and then download the example file. 
-                            For opening this app in web-browser click on \"Open in Browser\" as shown below -"),
-                          img(src = "example1.png")), #, height = 280, width = 400
+                            Download will work only in web-browsers. So open this app in a web-browser and then download the example file.")), 
+                          
                 # 
                 # tabPanel("Summary Stats", verbatimTextOutput("summary")),
                 # tabPanel("Correlation", verbatimTextOutput("correlation"),plotOutput("heatmap")),
@@ -74,12 +72,12 @@ shinyUI(pageWithSidebar(
                 tabPanel("Model Output", h4("Model Summary"),verbatimTextOutput("olssummary")),
               #  tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),h4("Correlation"),plotOutput("corplot")),
                  tabPanel("Prediction Probablities", 
-                          h4(p("Download Output Probabilities")),
-                          downloadButton('downloadData1', 'Download model training input file (works only in browsers)'),
+                          h4(p("Download output probabilities (training data)")),
+                          downloadButton('downloadData1', 'Download output probabilities (works only in browsers)'),
                           br(),br(),
                           h4("Probablities"),verbatimTextOutput("probablities")),
-                 tabPanel("Confusion Matrix", h4("Confusion Matrix Summary"),verbatimTextOutput("confusionmatrix"))
-              #   tabPanel("ROC Curve", h4("ROC Curve Summary"),plotOutput("ROC"))
+                 tabPanel("Confusion Matrix", h4("Confusion Matrix Summary"),verbatimTextOutput("confusionmatrix")),
+                 tabPanel("ROC Curve", h4("ROC Curve Summary"),plotOutput("ROC")),
                  
                 #          h4("Summary OLS standardized model"),
                 #          verbatimTextOutput("olssummarystd")),
@@ -88,13 +86,10 @@ shinyUI(pageWithSidebar(
                 #          plotOutput("resplot3"),h4("Residuals plot"),
                 #          plotOutput("resplot1")),
                 # tabPanel("Data with predicted Y",tableOutput("datatable")),
-                # tabPanel("Prediction",br(),
-                #          h4("First 10 rows of predicted data"),
-                #          p('"Yhat" column is the predicted value.'),
-                #          verbatimTextOutput('prediction'),
-                #          h4("Download Predicted data"),
-                #          downloadButton('downloadData1', 'Download Predicted data (Works only in browser)')
-                # )                
+              tabPanel("Prediction New Data", 
+                       h4(p("Download Predictions")),
+                       downloadButton('downloadData2', 'Download output (works only in browsers)'))
+              
                 
     )#type tabs
   ) #main panel
