@@ -1,21 +1,26 @@
 ###########################################################
-#   Decision Tree App (server)          #
+#  Classification and Regression Tree App (server)        #
 ###########################################################
-try(require("shiny")||install.packages("shiny"))
-try(require("pastecs")||install.packages("pastecs"))
-try(require("rpart")||install.packages("rpart"))
-try(require("rpart.plot")||install.packages("rpart.plot"))
-try(require("dplyr")||install.packages("dplyr"))
-try(require("Hmisc")||install.packages("Hmisc"))
-try(require("party")||install.packages("party"))
-try(require("partykit")||install.packages("partykit"))
+suppressPackageStartupMessages({
+  try(require("shiny")||install.packages("shiny"))
+  try(require("pastecs")||install.packages("pastecs"))
+  try(require("rpart")||install.packages("rpart"))
+  try(require("rpart.plot")||install.packages("rpart.plot"))
+  try(require("dplyr")||install.packages("dplyr"))
+  try(require("Hmisc")||install.packages("Hmisc"))
+  try(require("hydroGOF")||install.packages("hydroGOF"))
+  try(require("party")||install.packages("party"))
+  try(require("partykit")||install.packages("partykit"))
+})
 
 
 library(shiny)
 library(rpart)
+library(rpart.plot)
 library(pastecs)
 library(dplyr)
 library(Hmisc)
+library(hydroGOF)
 require(party)
 require(partykit)
 
@@ -32,20 +37,11 @@ shinyServer(function(input, output,session) {
     }
   })
 
-  pred.readdata <- reactive({
-    if (is.null(input$filep)) { return(NULL) }
-    else{
-      readdata <- as.data.frame(read.csv(input$filep$datapath ,header=TRUE, sep = ","))
-      return(readdata)
-    }
-  })
-
-    
   # Select variables:
   output$yvarselect <- renderUI({
     if (is.null(input$file)) {return(NULL)}
     
-    selectInput("yAttr", "Select Y variable",
+    selectInput("yAttr", "Select Y variable (Is it is a categorical variable? mark it as factor variable)",
                 colnames(readdata()), colnames(readdata())[1])
     
   })
@@ -66,8 +62,8 @@ shinyServer(function(input, output,session) {
   output$fxvarselect <- renderUI({
     if (identical(readdata.temp(), '') || identical(readdata.temp(),data.frame())) return(NULL)
     
-    checkboxGroupInput("fxAttr", "Select factor variable in Data set",
-                       colnames(readdata.temp()) )
+    checkboxGroupInput("fxAttr", "Select factor (categorical) variables",
+                       colnames(readdata.temp()),input$yAttr )
     
   })
   
@@ -85,18 +81,6 @@ shinyServer(function(input, output,session) {
   })
   
   
-  Dataset.Predict <- reactive({
-    fxc = setdiff(input$fxAttr, input$yAttr)
-    mydata = pred.readdata()[,c(input$xAttr)]
-    
-    if (length(fxc) >= 1){
-      for (j in 1:length(fxc)){
-        mydata[,fxc[j]] = as.factor(mydata[,fxc[j]])
-      }
-    }
-    return(mydata)
-  })
-  
   # a = c('a','b','c')
   # b = ('c')
   # setdiff(a,b)
@@ -104,6 +88,7 @@ shinyServer(function(input, output,session) {
   
   out = reactive({
     data = Dataset()
+    Missing=data[!complete.cases(data),]
     Dimensions = dim(data)
     Head = head(data)
     Tail = tail(data)
@@ -117,11 +102,11 @@ shinyServer(function(input, output,session) {
     fa = which(Class %in% c("factor","character"))
     nu.data = data[,nu] 
     fa.data = data[,fa] 
-    Summary = list(Numeric.data = round(stat.desc(nu.data)[c(4,5,6,8,9,12,13),] ,4), factor.data = describe(fa.data))
+    Summary = list(Numeric.data = round(stat.desc(nu.data)[c(4,5,6,8,9,12,13),] ,3), factor.data = describe(fa.data))
     
     a = seq(from = 0, to=200,by = 4)
     j = length(which(a < ncol(nu.data)))
-    out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j)
+    out = list(Dimensions = Dimensions,Summary =Summary ,Tail=Tail,fa.data,nu.data,a,j, Head=Head, MissingDataRows=Missing)
     return(out)
   })
   
@@ -131,6 +116,28 @@ shinyServer(function(input, output,session) {
       out()[1:2]
     }
   })
+  
+  output$head = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      out()[8]
+    }
+  })
+  
+  output$tail = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      out()[3]
+    }
+  })
+  
+  output$missing = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      out()[9]
+    }
+  })
+  
   
   testsample =  reactive({
   set.seed(5898)
@@ -145,17 +152,54 @@ shinyServer(function(input, output,session) {
     Dataset()[testsample(),]
   })
   
+  pred.readdata <- reactive({
+    if (is.null(input$filep)) { return(NULL) }
+    else{
+      readdata <- as.data.frame(read.csv(input$filep$datapath ,header=TRUE, sep = ","))
+      return(readdata)
+    }
+  })
   
+  Dataset.Predict <- reactive({
+    fxc = setdiff(input$fxAttr, input$yAttr)
+    mydata = pred.readdata()[,c(input$xAttr)]
+    
+    if (length(fxc) >= 1){
+      for (j in 1:length(fxc)){
+        mydata[,fxc[j]] = as.factor(mydata[,fxc[j]])
+      }
+    }
+    return(mydata)
+  }) 
   
-  #------------------------------------------------#
-  #---------- classification tree------------#
+  output$trainobs = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      dim( train_data())
+    }
+  })
+  
+  output$testobs = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      dim( test_data())
+    }
+  })
+  
+  output$predictobs = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      dim(Dataset.Predict())
+    }
+  })
+  
   #------------------------------------------------#
   fit.rt = reactive({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
   x = setdiff(colnames(Dataset()), input$Attr)
   y = input$yAttr
-  # formula1 =
+  # formula1 = 
   ## mean predictions
   
   if (class(train_data()[,c(input$yAttr)]) == "factor"){
@@ -164,8 +208,8 @@ shinyServer(function(input, output,session) {
                   method="class",   # use "class" for classification trees
                 data=train_data())
   pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
-  val = predict(pr, newdata = test_data(),type="response")
-  
+  val1 = predict(pr, newdata = test_data(),type="response")
+  val = predict(pr, newdata = train_data(),type="response")
   imp = round(fit.rt$variable.importance/sum(fit.rt$variable.importance),2)
   
   } else {
@@ -174,57 +218,93 @@ shinyServer(function(input, output,session) {
                   method="anova",   # use "class" for classification trees
                   data=train_data())
   pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
-   val = predict(pr, newdata = test_data())
+   val1 = predict(pr, newdata = test_data())
+   val = predict(pr, newdata = train_data())
    imp = round(fit.rt$variable.importance/sum(fit.rt$variable.importance),2)
   }
   
-  out = list(model = fit.rt, validation = val, imp = imp)
+  out = list(model = fit.rt, validation = val, imp = imp, validation1=val1)
     })
-
-  #------------------------------------------------------#
-  #------------- Regression trees----------------------#
-  #------------------------------------------------------#
   
-  fit.rf = reactive({
-    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-    
-    x = setdiff(colnames(Dataset()), input$Attr)
-    y = input$yAttr
-    # formula1 = 
-    ## mean predictions
-    
+#-------------------------------------
+  
+  prediction = reactive({
     if (class(train_data()[,c(input$yAttr)]) == "factor"){
-      fit.randf <- randomForest(as.factor(train_data()[,c(input$yAttr)]) ~ .,train_data(),ntree = 500,mtry = 4,nodesize = 5,importance = TRUE)
-      print(class(fit.randf))
-      val <- predict(fit.randf,test_data())
-    } else {
-      fit.randf <- randomForest(as.factor(train_data()[,c(input$yAttr)]) ~ .,train_data(),ntree = 500,mtry = 4,nodesize = 5,importance = TRUE)
-      print(class(fit.randf))
-      val <- predict(fit.randf,test_data())
+      
+      fit.rt <- fit.rt()$model
+      pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
+      val3 = predict(pr, newdata = Dataset.Predict(),type="response")
+      
+    } 
+    else {
+      fit.rt <- fit.rt()$model
+      pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
+      val3 = predict(pr, newdata = Dataset.Predict())
+      
     }
     
-    out <- list(model = fit.randf,validation = val)
-    return(out)
+    out = data.frame(Yhat = val3, pred.readdata())
+    return(out)    
+    
   })
-  #------------------------------------------------------#
+  
+  predictionorg = reactive({
+    if (class(train_data()[,c(input$yAttr)]) == "factor"){
+      
+      fit.rt <- fit.rt()$model
+      pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
+      val3 = predict(pr, newdata = Dataset(),type="response")
+      
+    } 
+    else {
+      fit.rt <- fit.rt()$model
+      pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
+      val3 = predict(pr, newdata = Dataset())
+      
+    }
+    
+    out = data.frame(Yhat = val3, readdata())
+    return(out)    
+    
+  })
+#---------------------------------------------------------------  
+  
+
+  output$validation1 = renderPrint({
+    if (is.null(input$file)) {return(NULL)}
+    
+    if (class(test_data()[,c(input$yAttr)]) == "factor"){
+      y = test_data()[,input$yAttr]
+      yhat = fit.rt()$validation1
+    confusion_matrix = table(y,yhat)
+    accuracy = (sum(diag(confusion_matrix))/sum(confusion_matrix))
+    out = list(Confusion_matrix_of_Validation = confusion_matrix, Accuracy_of_Validation = accuracy)
+    } else {
+    dft = data.frame(scale(data.frame(y = test_data()[,input$yAttr], yhat = fit.rt()$validation1)))
+    mse.y = mse(dft$y,dft$yhat)
+    out = list(Mean_Square_Error_of_Standardized_Response_in_Test_Data = mse.y)
+    } 
+    out
+       })
+  
   output$validation = renderPrint({
     if (is.null(input$file)) {return(NULL)}
     
     if (class(train_data()[,c(input$yAttr)]) == "factor"){
-      y = test_data()[,input$yAttr]
+      y = train_data()[,input$yAttr]
       yhat = fit.rt()$validation
-    confusion_matrix = table(y,yhat)
-    accuracy = (sum(diag(confusion_matrix))/sum(confusion_matrix))*100
-    out = list(Confusion_matrix_of_Validation = confusion_matrix, Accuracy_of_Validation = accuracy)
+      confusion_matrix = table(y,yhat)
+      accuracy = (sum(diag(confusion_matrix))/sum(confusion_matrix))
+      out = list(Confusion_matrix_of_Validation = confusion_matrix, Accuracy_of_Validation = accuracy)
     } else {
-    dft = data.frame(scale(data.frame(y = test_data()[,input$yAttr], yhat = fit.rt()$validation)))
-    mse.y = mse(dft$y,dft$yhat)
-    out = list(Mean_Square_Error_of_Standardized_Response_in_Validation = mse.y)
+      dft = data.frame(scale(data.frame(y = train_data()[,input$yAttr], yhat = fit.rt()$validation)))
+      mse.y = mse(dft$y,dft$yhat)
+      out = list(Mean_Square_Error_of_Standardized_Response_in_Training_Data = mse.y)
     } 
     out
-       })
-
+  })
   
+
   #------------------------------------------------#
   output$results = renderPrint({
     
@@ -264,51 +344,30 @@ shinyServer(function(input, output,session) {
     
     title1 = paste("Decision Nodes for", input$yAttr)
     
-    fit.rt1 = fit.rt()$model     
-    fit.rt1$frame$yval = as.numeric(rownames(fit.rt()$model$frame))    
+    fit.rt1 = fit.rt()$model
+    fit.rt1$frame$yval = as.numeric(rownames(fit.rt()$model$frame))
     
     # create attractive postcript plot of tree 
-    prp(fit.rt1,type=1,extra=1,under=TRUE,split.font=1,varlen=-10)
-    
-    # post(fit.rt1, 
-    #      # file = "tree2.ps", 
-    #      filename = "",   # will print to console
-    #      use.n = FALSE,
-    #      compress = TRUE,
-    #      title = title1) 
+    post(fit.rt1, 
+         #file = "tree2.ps", 
+         filename = "",   # will print to console
+         use.n = FALSE,
+         compress = TRUE,
+         title = title1) 
     
   })
   
   output$plot3 = renderPlot({
     if (is.null(input$file)) {return(NULL)}
     
-    title1 = paste("Decision Tree for", input$yAttr)
+    title1 = paste("decision tree of", input$yAttr, "in test data")
     
-    prp(fit.rt()$model,type=1,extra=1,under=TRUE,split.font=1,varlen=-10)
-    
-  # post(fit.rt()$model, 
-  #      # file = "tree2.ps", 
-  #      filename = "",   # will print to console
-  #      use.n = TRUE,
-  #      compress = TRUE,
-  #      title = title1) 
-  })
-  
-  output$plot4 = renderPlot({
-    if (is.null(input$file)) {return(NULL)}
-    
-    title1 = paste("Regression Tree for", input$yAttr)
-    varImpPlot(fit.rf()$model,type = 1)
-    
-    # confusionMatrix(fit.rf$validation,test_data()[,c(input$yAttr)])
-    
-    
-    # post(fit.rt()$model, 
-    #      # file = "tree2.ps", 
-    #      filename = "",   # will print to console
-    #      use.n = TRUE,
-    #      compress = TRUE,
-    #      title = title1) 
+  post((fit.rt()$model), 
+       # file = "tree2.ps", 
+       filename = "",   # will print to console
+       use.n = TRUE,
+       compress = TRUE,
+       title = title1) 
   })
   
   
@@ -333,53 +392,47 @@ shinyServer(function(input, output,session) {
   
   })
 
-  # my edits below
-  # output$nodesout = renderPrint({
-  #  head(nodes1(),15)
-  # })
+  output$nodesout1 = renderPrint({
+    head(nodes1(),15)
+  })
   
- #  output$nodesout = renderTable({
- #   head(data.frame(nodes1(), train_data()), min(50, nrow(train_data())))     })
-
-output$nodesout <- renderDataTable({  	
-       data.frame(nodes1(), train_data())
-	}, options = list(lengthMenu = c(10, 30, 50), pageLength = 100))  # my edits here
-	  
+  output$nodesout <- renderDataTable({  	
+    data.frame(nodes1(), train_data())
+  }, options = list(lengthMenu = c(10, 20, 50), pageLength = 10))  # my edits here
+  
   output$downloadData3 <- downloadHandler(
     filename = function() { "Nodes Info.csv" },
     content = function(file) {
       if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-      dft = data.frame(nodes1(), train_data());   # data.frame(row_numer = row.names(nodes1()), nodes1())
+      dft = data.frame(row_numer = row.names(nodes1()), nodes1(), train_data());   # data.frame(row_numer = row.names(nodes1()), nodes1())
       write.csv(dft, file, row.names=F, col.names=F)
     }
   )
-  
-  prediction = reactive({
-    if (class(train_data()[,c(input$yAttr)]) == "factor"){
-      
-      fit.rt <- fit.rt()$model
-      pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
-      val = predict(pr, newdata = Dataset.Predict(),type="response")
-      
-    } 
-    else {
-      fit.rt <- fit.rt()$model
-      pr <- as.party(fit.rt)    # thus, we use same object 'rp' from the raprt package
-      val = predict(pr, newdata = Dataset.Predict())
-      
+  output$downloadData4 <- downloadHandler(
+    filename = function() { "Nodes Info.csv" },
+    content = function(file) {
+      if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+      dft = data.frame(row_numer = row.names(nodes1()), nodes1(), train_data());   # data.frame(row_numer = row.names(nodes1()), nodes1())
+      write.csv(dft, file, row.names=F, col.names=F)
     }
-    
-    out = data.frame(Yhat = val, pred.readdata())
-    return(out)    
-    
-  })
-  
+  )  
+
   output$prediction =  renderPrint({
     if (is.null(input$filep)) {return(NULL)}
     head(prediction(),10)
   })
-  
+  output$predictionorg =  renderPrint({
+    if (is.null(input$filep)) {return(NULL)}
+    head(predictionorg(),10)
+  })  
   #------------------------------------------------#
+  output$downloadData0 <- downloadHandler(
+    filename = function() { "Predicted Data.csv" },
+    content = function(file) {
+      if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+      write.csv(predictionorg(), file, row.names=F, col.names=F)
+    }
+  )
   output$downloadData1 <- downloadHandler(
     filename = function() { "Predicted Data.csv" },
     content = function(file) {
@@ -388,17 +441,11 @@ output$nodesout <- renderDataTable({
     }
   )
   output$downloadData <- downloadHandler(
-    filename = function() { "beer data.csv" },
+    filename = function() { "mTitanicAll.csv" },
     content = function(file) {
-      write.csv(read.csv("data/beer data.csv"), file, row.names=F, col.names=F)
+      write.csv(read.csv("data/mTitanicAll.csv"), file, row.names=F, col.names=F)
     }
   )
-  
-  output$downloadData2 <- downloadHandler(
-    filename = function() { "beer data - prediction sample.csv" },
-    content = function(file) {
-      write.csv(read.csv("data/beer data - prediction sample.csv"), file, row.names=F, col.names=F)
-    }
-  )
+
   
   })

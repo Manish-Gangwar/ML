@@ -121,15 +121,15 @@ output$summary = renderPrint({
 # Select variables:
 output$outselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  selectInput("yAttr", "Select variable for Rosner's outlier test",
-              colnames(Dataset.temp()), colnames(Dataset.temp())[1])
+  selectInput("rAttr", "Select variable for Rosner's outlier test",
+              colnames(out()[[5]]), colnames(out()[[5]])[1])
   
 })
 
 output$outlier = renderPrint({
   if (is.null(input$file)) {return(NULL)}
   else {
-    rosnerTest(Dataset()[,input$yAttr])
+    rosnerTest(Dataset()[,input$rAttr])
   }
 })
 
@@ -140,7 +140,14 @@ output$heatmap = renderPlot({
 })
 
 plotsample =  reactive({
-  sample(1:nrow(mydata()), round( if (nrow(mydata()>500)) {500} else {nrow(mydata())}  ))
+  sizedata= nrow(mydata())
+  smp=(
+    if (sizedata>500) {500} 
+    else {
+      sizedata
+          }
+      )
+  sample( 1:sizedata, smp )
 })
 
 plot_data = reactive({

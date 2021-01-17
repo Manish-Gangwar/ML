@@ -1,5 +1,5 @@
 ####################################################
-#      Summary & GLM App                           #
+#      Summary & OLS App IIDS                          #
 ####################################################
 
 library("shiny")
@@ -7,8 +7,9 @@ library("shiny")
 
 shinyUI(pageWithSidebar(
   # Header:
-  #headerPanel("Logistic Regression (Binary Logit) App"),
-  headerPanel(title=div(img(src="isb.png",align = "right"), h2("Logistic Regression (Binary Logit) App", style="bold"))),
+  #headerPanel("OLS App"),
+  headerPanel(title=div(img(src="logo.png",align = "right"), h2("Regression App", style="bold"))),
+  #titlePanel(title=div(img(src="logo.png",align='right'),"OLS App")),
   # Input in sidepanel:
   sidebarPanel(
 
@@ -39,30 +40,28 @@ shinyUI(pageWithSidebar(
                             by selecting that variable in the last list of variables
                            ",align="justify"),
                          br(),
-                    #     h4(p("Download Sample Input Files")),
+                        # h4(p("Download Sample Input Files")),
                          # br(),
-                     #    downloadButton('downloadData', 'Download Sample Data (works only in browsers)'),
-                      #   br(),
-                       #  br(),
+                        # downloadButton('downloadData', 'Download Sample Data (works only in browsers)'),
+                        # br(),
+                        # br(),
                         # p("*Please note that download will not work with RStudio interface. Download will work only in web-browsers."),
                          ),
-                tabPanel("Data Summary",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
+                tabPanel("Summary Stats",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
                          h4("Data Summary"),verbatimTextOutput("summary"),h4("Missing Data Rows"),verbatimTextOutput("missing")),
-                tabPanel("Summary Logit", h4("Summary Logit Model"),verbatimTextOutput("olssummary"),
-                              h4('Confusion Matrix'), verbatimTextOutput("validation")),
-                         #h4("Summary OLS standardized model"), verbatimTextOutput("olssummarystd")),
-                tabPanel("Data with predicted Y", h4("Download Input Data with Predicted Probability of Y=1"),
+                tabPanel("Summary OLS", h4("Summary OLS Model"),verbatimTextOutput("olssummary"),
+                         h4('Mean Square Error'),verbatimTextOutput("validation"),
+                         h4("Summary OLS standardized model"), verbatimTextOutput("olssummarystd")),
+                tabPanel("Input Data with Predictions", h4("Download Input Data with Predicted Y"),
                          downloadButton('downloadData2', 'Download Data (Works only in browser)'),
                          br(),br(),tableOutput("datatable")),
-               # tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
+              #  tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
                #          h4("Correlation Visulization - Input Data"),plotOutput("corplot")),
-                tabPanel("ROC", 
-                         sliderInput('cutoff','Cutoff Probability (default=0.5)',0,1,0.5),
-                         h4("Confusion Matrix Summary"),verbatimTextOutput("confusionmatrix"),
-                         h4("ROC Curve"),plotOutput("roc")),
-                #tabPanel("Residuals Plot",
-                      #   h4("Fitted Values vs Residuals - Input Data"), plotOutput("resplot2"),
-                      #   h4("Fitted Values vs Y - Input Data"), plotOutput("resplot3")),
+              #  tabPanel("Corr-Hist",h4("Discriptive Analytics - Random 100 Input Data Rows"),plotOutput("heatmap1")),
+                tabPanel("Residuals Plot",h4("Fitted Values vs Residuals - Input Data"),
+                         plotOutput("resplot2",height = 800),h4("Fitted Values vs Y - Input Data"),
+                         plotOutput("resplot3",height = 800),h4("Residuals plot - Input Data"),
+                         plotOutput("resplot1",height = 800)),
                 tabPanel("Prediction New Data",br(),
                          h4("First 10 rows of predictions for new data (upload prediction data)"),
                          p('"Yhat" column is the predicted value.'),
