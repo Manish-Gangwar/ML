@@ -30,21 +30,43 @@ shinyServer(function(input, output){
     }
   })
   
-  output$xvarselect <- renderUI({
-    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-    
-    checkboxGroupInput("xAttr", "Select X variables to be used in segmentation analysis",
-                       colnames(Dataset()), colnames(Dataset()) )
-    
+  nu.Dataset = reactive({
+    data = Dataset()
+    Class = NULL
+    for (i in 1:ncol(data)){
+      c1 = class(data[,i])
+      Class = c(Class, c1)
+    }
+    nu = which(Class %in% c("numeric","integer"))
+    nu.data = data[,nu] 
+    return(nu.data)
   })
   
-  Dataset1 = reactive({
-    mydata = Dataset()[,c(input$xAttr)]
-    return(mydata)
+  output$xvarselect <- renderUI({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    checkboxGroupInput("xAttr", "Select only numerical X variables",
+                       colnames(Dataset()), colnames(nu.Dataset()) )
+    }
   })
+  
+  output$fxvarselect <- renderUI({
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    if (is.null(input$file)) {return(NULL)}
+    else {
+    checkboxGroupInput("fxAttr", "Factor variable in X",
+                       setdiff(colnames(Dataset()),"") )
+    }
+  })
+
+  mydata = reactive({
+   mydata = Dataset()[,c(input$xAttr)]
+  return(mydata)
+ })
   
   out = reactive({
-    data = Dataset1()
+    data = mydata()
     Missing=data[!complete.cases(data),]
     Dimensions = dim(data)
     Head = head(data)
@@ -67,7 +89,7 @@ shinyServer(function(input, output){
   })
   
   Dataset2 = reactive({
-    x0 = Dataset1()
+    x0 = mydata()
     x01 = scale(x0, center = T, scale = T)
     dstd = data.frame(x01)
     #colnames(dstd) = c(colnames(x01))
@@ -127,9 +149,9 @@ shinyServer(function(input, output){
       else {
         fit = kmeans(Dataset2(),input$Clust)
         Segment =  fit$cluster
-        d = data.frame(r.name = row.names(Dataset1()),Segment,Dataset1())
+        d = data.frame(r.name = row.names(mydata()),Segment,mydata())
         Cluster.Membership = as.character(fit$cluster)
-        clustmeans = aggregate(Dataset1(),by = list(Cluster.Membership), FUN = mean)
+        clustmeans = aggregate(mydata(),by = list(Cluster.Membership), FUN = mean)
         Summary = list(d, Cluster.Membership = Cluster.Membership, Cluster.Means =clustmeans, Count = table(Cluster.Membership) )
         return(Summary)
       }
@@ -144,9 +166,9 @@ shinyServer(function(input, output){
         distm <- dist(Dataset2(), method = "euclidean") # distance matrix
         fit <- hclust(distm, method="ward.D") 
         Segment =  cutree(fit, k=input$Clust)
-        d = data.frame(r.name = row.names(Dataset1()),Segment,Dataset1())
+        d = data.frame(r.name = row.names(mydata()),Segment,mydata())
         Cluster.Membership =  as.character(cutree(fit, k=input$Clust))
-        clustmeans = aggregate(Dataset1(),by = list(Cluster.Membership), FUN = mean)
+        clustmeans = aggregate(mydata(),by = list(Cluster.Membership), FUN = mean)
         Summary = list(d, Cluster.Membership = Cluster.Membership, Cluster.Means =clustmeans, Count = table(Cluster.Membership), ModelSumm = fit )
         return(Summary)
       }
@@ -155,11 +177,14 @@ shinyServer(function(input, output){
   })
     
     output$table <- renderDataTable({
+      if (is.null(input$file)) {return(NULL)}
+      else {
       t0()[[1]]
+      }
     }, options = list(lengthMenu = c(5, 30, 50,100), pageLength = 30))
     
     output$caption1 <- renderText({
-      if (input$select == ".") return ("choose cluster algorithm and click ''Apply Changes'' button")
+      if (input$select == ".") return ("choose cluster algorithm and click ''Apply Changes'' ")
       #else if (input$select == "Model Based") return ("Model Based Segmentation -  Summary")
       else if (input$select == "K-Means") return ("K-Means Segmentation -  Summary")
       else if (input$select == "Hierarchical") return ("Hierarchical Segmentation -  Summary")
@@ -203,7 +228,7 @@ shinyServer(function(input, output){
           d <- dist(Dataset2(), method = "euclidean") # distance matrix
           fit <- hclust(d, method="ward.D") 
           Cluster.Membership =  as.character(cutree(fit, k=input$Clust))
-          clustmeans = aggregate(Dataset1(),by = list(Cluster.Membership), FUN = mean)
+          clustmeans = aggregate(mydata(),by = list(Cluster.Membership), FUN = mean)
           Summary = list(Cluster.Membership = Cluster.Membership, Cluster.Means =clustmeans, Count = table(Cluster.Membership), ModelSumm = fit )
           Summary
         }
@@ -274,8 +299,9 @@ shinyServer(function(input, output){
     output$downloadData4 <- downloadHandler(
       filename = function() { "segmentation.csv" },
       content = function(file) {
-        write.csv(t0(), file, row.names=F)
+      write.csv(t0(), file, row.names=F)
       }
+      
     )
 
 })

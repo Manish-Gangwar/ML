@@ -22,8 +22,9 @@ shinyUI(pageWithSidebar(
     htmlOutput("Choicevarselect"),
     htmlOutput("Individualvarselect"),
     htmlOutput("Alternativesvarselect"),
-    htmlOutput("Alternativefeaturesvarselect"),
-    htmlOutput("Individualfeaturesvarselect"),
+        htmlOutput("Alternativefeaturesvarselect"),
+   # submitButton(text = "Apply Changes", icon("refresh")),br(),
+        htmlOutput("Individualfeaturesvarselect"),
     fileInput("filep", "Upload new data for prediction (csv file with header)"),
     br()
   ),
@@ -34,21 +35,21 @@ shinyUI(pageWithSidebar(
                 #
                 
                 tabPanel("Overview",
-                         h4(p("Data Description")),
+                         h4(p("Sample Data Description")),
                          p("The data, collected as part of a 1987 intercity mode choice study, are a sub-sample of 210 non-business trips between Sydney, Canberra and Melbourne in which the traveler chooses a mode from four alternatives (plane, car, bus and train). The sample, 840 observations, is choice based with over-sampling of the less popular modes (plane, train and bus) and under-sampling of the more popular mode, car. The level of service data was derived from highway and transport networks in Sydney, Melbourne, non-metropolitan N.S.W. and Victoria, including the Australian Capital Territory.",align="justify"),
-                           h4(p("Download Sample Input Files")),
-                           downloadButton('downloadData', 'Download model training input file (works only in browsers)'),
-                           br(),br(),
+                         #  h4(p("Download Sample Input Files")),
+                          # downloadButton('downloadData', 'Download model training input file (works only in browsers)'),
+                         #  br(),br(),
                          p("Number of observations: 840 Observations on 4 Modes of transporataion, for 210 Individuals.",align="justify"),
                          h4('model specification variables'),
                             h5('observation ID (individual ID)'),
                             h5('choice     = 0 - no 1 - yes'),
-                            h5('mode     =  available alternatives'),
-                         h4('alternative specific variables (cannot be categorical)'),
+                            h5('available alternatives = mode'),
+                         h4('alternative specific variables (not categorical)'),
                            h5('wait       = terminal waiting time for plane, train and bus (minutes); 0 for car.'),
                            h5('vcost      = in vehicle cost for all stages (dollars).'),
                            h5('gcost      = generalized cost measure:invc+(invt*value of travel time savings)(dollars).'),
-                         h4('observation specific variables (cannot be categorical)'),
+                         h4('observation specific variables (not categorical)'),
                            h5('icome      = household income'),
                            h5('size       = traveling group size'),
                 #          h5('lite_beer       =    Whether low calorie beer'),
@@ -61,8 +62,9 @@ shinyUI(pageWithSidebar(
                 #          h5('month    =    month number 1 to 12'),
                 #          ))
                           br(),
-                          p("Please note that download will not work with RStudio interface. 
-                            Download will work only in web-browsers. So open this app in a web-browser and then download the example file.")), 
+                #          p("Please note that download will not work with RStudio interface. 
+                #            Download will work only in web-browsers. So open this app in a web-browser and then download the example file.")
+                ), 
                           
                 # 
                 # tabPanel("Summary Stats", verbatimTextOutput("summary")),

@@ -47,30 +47,46 @@ pred.readdata <- reactive({
 # Select variables:
 output$yvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  
+  if (is.null(input$file)) {return(NULL)}
+  else {
   selectInput("yAttr", "Select Y variable (must be binary 0/1 variable)",
                      colnames(Dataset()), colnames(Dataset())[1])
-  
+  }
 })
 
 output$xvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  
+  if (is.null(input$file)) {return(NULL)}
+  else {
   checkboxGroupInput("xAttr", "Select X variables",
                      setdiff(colnames(Dataset()),input$yAttr), setdiff(colnames(Dataset()),input$yAttr))
-  
+  }
 })
 
 Dataset.temp = reactive({
   mydata = Dataset()[,c(input$yAttr,input$xAttr)]
 })
 
+nu.Dataset = reactive({
+  data = Dataset.temp()
+  Class = NULL
+  for (i in 1:ncol(data)){
+    c1 = class(data[,i])
+    Class = c(Class, c1)
+  }
+  nu = which(Class %in% c("numeric","integer"))
+  nu.data = data[,nu] 
+  return(nu.data)
+})
+
 output$fxvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  
+  if (is.null(input$file)) {return(NULL)}
+  else {
   checkboxGroupInput("fxAttr", "Select factor (categorical) variables in X",
-                     setdiff(colnames(Dataset.temp()),input$yAttr),"" )
-  
+                #     setdiff(colnames(Dataset.temp()),input$yAttr),"" )
+                setdiff(colnames(Dataset.temp()),input$yAttr),setdiff(colnames(Dataset.temp()),c(input$yAttr,colnames(nu.Dataset()))) )
+  }
 })
 
 mydata = reactive({
@@ -167,76 +183,12 @@ plot_data = reactive({
 })
 
 
-output$correlation = renderPrint({
-  cor(out()[[5]], use = "pairwise.complete.obs")
-  })
-
-output$corplot = renderPlot({
-  my_data = out()[[5]]
-  cor.mat <- round(cor(my_data),2)
-  corrplot(cor.mat, 
-           type = "upper",    # upper triangular form
-           order = "hclust",  # ordered by hclust groups
-           tl.col = "black",  # text label color
-           tl.srt = 45)  
-  
-})
-
 ols = reactive({
     rhs = paste(input$xAttr, collapse = "+")
     ols = glm(paste(input$yAttr,"~", rhs , sep=""), data = mydata(), family=binomial)
   return(ols)
 })
 
-ols2 = reactive({
-  
-  drop = which(input$yAttr == colnames(out()[[5]]))
-               
-  x0 = out()[[5]][,-drop]
-  x01 = scale(x0, center = T, scale = T)
-  
-  y = out()[[5]][,drop]
-  
-  dstd = data.frame(y,x01)
-  colnames(dstd) = c(input$yAttr,colnames(x01))
-  
-  if (ncol(data.frame(out()[[4]])) == 1) {
-    fdata = data.frame(out()[[4]])
-    colnames(fdata) = input$fxAttr
-    dstd = data.frame(dstd,fdata)
-  }
-  
-  else if (ncol(data.frame(out()[[4]])) > 1) {
-    fdata = data.frame(out()[[4]])
-    dstd = data.frame(dstd,fdata)
-  }
-  
-  rhs = paste(input$xAttr, collapse = "+")
-  ols = glm(paste(input$yAttr,"~", rhs , sep=""), data = dstd, family=binomial)
-  return(ols)
-
-  })
-
-output$resplot1 = renderPlot({
-  if (is.null(input$file)) {return(NULL)}
-  else {
-  plot(ols()$residuals)
-  }
-})
-
-output$resplot2 = renderPlot({
-  if (is.null(input$file)) {return(NULL)}
-  else {
-  plot(ols()$residuals, ols()$fitted.values)
-  }
-})
-
-output$resplot3 = renderPlot({
-  if (is.null(input$file)) {return(NULL)}
-  else {
-  plot(ols()$fitted.values, mydata()[,input$yAttr])#
-  }
-})
 
 
 output$olssummary = renderPrint({
@@ -246,20 +198,15 @@ output$olssummary = renderPrint({
   }
   })
 
-output$olssummarystd = renderPrint({
-  summary(ols2())
-})
-
 output$datatable = renderTable({
   if (is.null(input$file)) {return(NULL)}
   else {
   Y.Prob = ols()$fitted.values
   data.frame(Y.Prob,mydata())
-  
   }
-})
+}, options = list(lengthMenu = c(10, 20, 50), pageLength = 10)  )
 
-inputprediction = reactive({
+inputpredicted = reactive({
   val = predict(ols(),Dataset(), type='response')
   out = data.frame(Y.Prob = val, Dataset())
 })
@@ -289,8 +236,6 @@ output$confusionmatrix = renderPrint({
 })
 
 
-
-
 output$roc = renderPlot({ 
   if (is.null(input$file)) {return(NULL)}
   else {
@@ -309,6 +254,11 @@ output$roc = renderPlot({
 output$prediction =  renderPrint({
   if (is.null(input$filep)) {return(NULL)}
   head(predicted(),10)
+})
+
+output$inputprediction =  renderPrint({
+  if (is.null(input$file)) {return(NULL)}
+  head(inputpredicted(),10)
 })
 
 #------------------------------------------------#

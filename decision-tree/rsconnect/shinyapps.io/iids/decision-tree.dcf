@@ -1,0 +1,10 @@
+name: decision-tree
+title:
+username:
+account: iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3506927
+bundleId: 4260821
+url: https://isb-iids.shinyapps.io/decision-tree/
+when: 1614072246.10502

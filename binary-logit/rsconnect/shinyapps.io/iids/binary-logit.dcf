@@ -1,0 +1,10 @@
+name: binary-logit
+title:
+username:
+account: iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3507013
+bundleId: 4256654
+url: https://isb-iids.shinyapps.io/binary-logit/
+when: 1613999350.33242

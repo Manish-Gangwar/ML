@@ -18,8 +18,8 @@ shinyUI(pageWithSidebar(
     h5(p("Data Selection")),
     htmlOutput("xvarselect"),
     htmlOutput("fxvarselect"),
-    br()
-  ),
+    #submitButton(text = "Apply Changes", icon("refresh")),br(),
+    ),
   # Main:
   mainPanel( 
     
@@ -45,11 +45,20 @@ shinyUI(pageWithSidebar(
                 tabPanel("Data",h4("Data"), verbatimTextOutput("head"),verbatimTextOutput("tail"),
                          h4("Data Summary"),verbatimTextOutput("summary")),
                 tabPanel("Missing Data", h4("Missing Data Rows"),verbatimTextOutput("missing")),
-                tabPanel("Correlation",h4("Correlation Table"), verbatimTextOutput("correlation"),
-                         h4("Correlation Visulization"),plotOutput("corplot")),
+                tabPanel("Correlation",
+                          h4("Correlation Visulization"),plotOutput("corplot"),
+                          h4("Correlation Table"), verbatimTextOutput("correlation")),
                 tabPanel("Box Plot", h4("Box Plots"),plotOutput("bplot")),
-                tabPanel("Data Visulization",h4("Discriptive Analytics (randomly selected 500 input data rows - If less than 500 rows in dataset, select whole dataset)"),plotOutput("heatmap1")),
-                tabPanel("Outliers",htmlOutput("outselect"), h4("selcet a variable at the top for Rosner's outliers"),verbatimTextOutput("outlier"))
+                tabPanel("Data Visulization",br(),
+                         h4("randomly select 500 rows from input data - if less than 500 rows in dataset, select whole dataset"),plotOutput("heatmap1")),
+                tabPanel("Outliers",htmlOutput("outselect"), 
+                         #h4("selcet a variable at the top for Rosner's outliers"),
+                         plotOutput("hist"),
+                         verbatimTextOutput("outlier")),
+                tabPanel("Data with Dummy Variables",
+                         br(),
+                         h4(p("download input data with dummy variable columns added")),
+                         downloadButton('downloadDatanew', 'download data'),  )
                 )
       ) 
     ) 

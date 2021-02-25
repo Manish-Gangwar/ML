@@ -10,6 +10,7 @@ if(!require("reshape2")){install.packages("reshape2")}
 if (!require("corrplot")) {install.packages("corrplot")}
 if (!require("PerformanceAnalytics")) {install.packages("PerformanceAnalytics")}
 if (!require("EnvStats")) {install.packages("EnvStats")}
+if (!require("fastDummies")) {install.packages("fastDummies")}
 
 library(shiny)
 library(pastecs)
@@ -20,6 +21,7 @@ library(reshape2)
 library(corrplot)
 library(PerformanceAnalytics)
 library(EnvStats)
+library(fastDummies)
 
 # library(gplot)
 
@@ -35,21 +37,37 @@ Dataset <- reactive({
 
 output$xvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  
+  if (is.null(input$file)) {return(NULL)}
+  else {
   checkboxGroupInput("xAttr", "Select variables",
                      colnames(Dataset()), colnames(Dataset()))
-  
+  }
 })
 
 Dataset.temp = reactive({
   mydata = Dataset()[,c(input$xAttr)]
 })
 
+nu.Dataset = reactive({
+  data = Dataset.temp()
+  Class = NULL
+  for (i in 1:ncol(data)){
+    c1 = class(data[,i])
+    Class = c(Class, c1)
+  }
+  nu = which(Class %in% c("numeric","integer"))
+  nu.data = data[,nu] 
+  return(nu.data)
+})
+
 output$fxvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+  if (is.null(input$file)) {return(NULL)}
+  else {
   checkboxGroupInput("fxAttr", "Select factor (categorical) variables",
-                     colnames(Dataset.temp()) )
-  
+                    #colnames(Dataset.temp()) )
+                    colnames(Dataset.temp()),setdiff(colnames(Dataset.temp()),c(colnames(nu.Dataset()))) )
+  }
 })
 
 mydata = reactive({
@@ -121,9 +139,18 @@ output$summary = renderPrint({
 # Select variables:
 output$outselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+  if (is.null(input$file)) {return(NULL)}
+  else {
   selectInput("rAttr", "Select variable for Rosner's outlier test",
               colnames(out()[[5]]), colnames(out()[[5]])[1])
-  
+  }
+})
+
+output$hist = renderPlot({
+  if (is.null(input$file)) {return(NULL)}
+  else {
+    hist(Dataset()[,input$rAttr])
+  }
 })
 
 output$outlier = renderPrint({
@@ -191,6 +218,13 @@ output$corplot = renderPlot({
   
 })
 
+
+output$downloadDatanew <- downloadHandler(
+  filename = function() { "califhouse.csv" },
+  content = function(file) {
+        write.csv(dummy_cols(mydata(), remove_first_dummy=TRUE), file, row.names=F, col.names=F)
+  }
+)
 
 output$downloadData <- downloadHandler(
   filename = function() { "califhouse.csv" },

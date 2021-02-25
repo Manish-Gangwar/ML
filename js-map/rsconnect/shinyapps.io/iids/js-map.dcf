@@ -1,0 +1,10 @@
+name: js-map
+title:
+username:
+account: iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3695406
+bundleId: 4269367
+url: https://isb-iids.shinyapps.io/js-map/
+when: 1614225388.41294

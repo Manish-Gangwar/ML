@@ -42,33 +42,61 @@ pred.readdata <- reactive({
   }
 })
 
+nu.Dataset = reactive({
+  data = Dataset()
+  Class = NULL
+  for (i in 1:ncol(data)){
+    c1 = class(data[,i])
+    Class = c(Class, c1)
+  }
+  nu = which(Class %in% c("numeric","integer"))
+  nu.data = data[,nu] 
+  return(nu.data)
+})
+
 # Select variables:
 output$yvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  
+  if (is.null(input$file)) {return(NULL)}
+  else {
   selectInput("yAttr", "Select Y variable",
-                     colnames(Dataset()), colnames(Dataset())[1])
-  
+                     colnames(nu.Dataset()), colnames(Dataset())[1])
+  }
 })
+
 
 output$xvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  
-  checkboxGroupInput("xAttr", "Select variables to be used in segemantaion analysis",
+  if (is.null(input$file)) {return(NULL)}
+  else {
+  checkboxGroupInput("xAttr", "Select X variables",
                      setdiff(colnames(Dataset()),input$yAttr), setdiff(colnames(Dataset()),input$yAttr))
-  
+  }
 })
 
 Dataset.temp = reactive({
   mydata = Dataset()[,c(input$yAttr,input$xAttr)]
 })
 
+nu1.Dataset = reactive({
+  data = Dataset.temp()
+  Class = NULL
+  for (i in 1:ncol(data)){
+    c1 = class(data[,i])
+    Class = c(Class, c1)
+  }
+  nu = which(Class %in% c("numeric","integer"))
+  nu.data = data[,nu] 
+  return(nu.data)
+})
+
 output$fxvarselect <- renderUI({
   if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-  
+  if (is.null(input$file)) {return(NULL)}
+  else {
   checkboxGroupInput("fxAttr", "Select factor (categorical) variables in X",
-                     setdiff(colnames(Dataset.temp()),input$yAttr),"" )
-  
+                     setdiff(colnames(Dataset.temp()),input$yAttr),setdiff(colnames(Dataset.temp()),c(input$yAttr,colnames(nu1.Dataset()))) )
+  }
 })
 
 mydata = reactive({
@@ -228,10 +256,15 @@ output$heatmap1 = renderPlot({
 })
 
 output$correlation = renderPrint({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   cor(out()[[5]], use = "pairwise.complete.obs")
+  }
   })
 
 output$corplot = renderPlot({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   my_data = out()[[5]]
   cor.mat <- round(cor(my_data),2)
   corrplot(cor.mat, 
@@ -239,7 +272,7 @@ output$corplot = renderPlot({
            order = "hclust",  # ordered by hclust groups
            tl.col = "black",  # text label color
            tl.srt = 45)  
-  
+  }
 })
 
 ols = reactive({
@@ -278,25 +311,39 @@ ols2 = reactive({
   })
 
 output$resplot1 = renderPlot({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   plot(ols()$residuals, ylab="Residuals")
-  
+  }
 })
 
 output$resplot2 = renderPlot({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   plot(ols()$residuals,ols()$fitted.values, xlab="Predicted Y", ylab="Residuals") #
+  }
 })
 
 output$resplot3 = renderPlot({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   plot(mydata()[,input$yAttr],ols()$fitted.values, xlab="Actual Y", ylab="Predicted Y")# , 
+  }
 })
 
 
 output$olssummary = renderPrint({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   summary(ols())
+  }
   })
 
 output$olssummarystd = renderPrint({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   summary(ols2())
+  }
 })
 
 output$validation = renderPrint({
@@ -308,8 +355,11 @@ output$validation = renderPrint({
 })
 
 output$datatable = renderTable({
+  if (is.null(input$file)) {return(NULL)}
+  else {
   Y.hat = ols()$fitted.values
   data.frame(Y.hat,mydata())
+  }
 })
 
 inputprediction = reactive({

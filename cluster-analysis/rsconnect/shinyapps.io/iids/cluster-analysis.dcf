@@ -1,0 +1,10 @@
+name: cluster-analysis
+title:
+username:
+account: iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3677405
+bundleId: 4259828
+url: https://isb-iids.shinyapps.io/cluster-analysis/
+when: 1614062393.1991

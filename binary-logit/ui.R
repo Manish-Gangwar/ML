@@ -18,6 +18,7 @@ shinyUI(pageWithSidebar(
     h5(p("Data Selection")),
     htmlOutput("yvarselect"),
     htmlOutput("xvarselect"),
+  #  submitButton(text = "Apply Changes", icon("refresh")),br(),
     htmlOutput("fxvarselect"),
     br()
   ),
@@ -53,7 +54,8 @@ shinyUI(pageWithSidebar(
                          #h4("Summary OLS standardized model"), verbatimTextOutput("olssummarystd")),
                 tabPanel("Data with predicted Y", h4("Download Input Data with Predicted Probability of Y=1"),
                          downloadButton('downloadData2', 'Download Data (Works only in browser)'),
-                         br(),br(),tableOutput("datatable")),
+                         br(),br(),tableOutput("datatable") #verbatimTextOutput('inputprediction')
+                         ),
                # tabPanel("Correlation",h4("Correlation Table - Input data"), verbatimTextOutput("correlation"),
                #          h4("Correlation Visulization - Input Data"),plotOutput("corplot")),
                 tabPanel("ROC", 

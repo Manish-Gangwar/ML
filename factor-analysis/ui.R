@@ -7,14 +7,15 @@ library("shiny")
 
 shinyUI(fluidPage(
   tags$head(includeScript("google_analytics.js")),
-  
+  title = "Factor analysis",
   # Header:
-  titlePanel("Factor analysis"),
+  #titlePanel("Factor analysis"),
+	titlePanel(title=div(img(src="logo.png",align='right'),"Factor analysis")),
   # Input in sidepanel:
   sidebarPanel(
     # Upload data:
-    fileInput("file", "Upload input data (csv file with header))"),  
-    
+    fileInput("file", "Upload input data (csv file with header)"),  
+    uiOutput("colList"),
     htmlOutput("fselect"),
     textInput('fname',label = "Enter Factor Name (seperated by comma)"),
     sliderInput("cutoff", "Cut-off for factor loadings(for Plotting only)", min = 0,  max = 1, value = 0.25),
@@ -47,12 +48,12 @@ p("This shiny application require one data input from the user. To do so, click 
   and then proceed. Make sure you have top row as variable names and first column as respondent id/name in csv file",align="justify"),
 p("Once csv file is uploaded successfully, application will fit a factor model with optimal factors from parallel Analysis and various 
 results will be showed in the above tabs. In left-side bar panel you can change the parameters value and correspondingly new results 
-  will be showed",align="justify"),
-br(),
-h4(p("Download Sample Input File")),
-downloadButton('downloadData', 'Download Example file'),
-p("Please note that download will not work with RStudio interface. Download will work only in web-browsers. So open this app in a web-browser and then download the example file. For opening this app in web-browser click on \"Open in Browser\" as shown below -"),
-img(src = "example1.png") #, height = 280, width = 400
+  will be showed.",align="justify"),
+#br(),
+#h4(p("Download Sample Input File")),
+#downloadButton('downloadData', 'Download Example file'),
+#p("Please note that download will not work with RStudio interface. Download will work only in web-browsers. So open this app in a web-browser and then download the example file. For opening this app in web-browser click on \"Open in Browser\" as shown below -"),
+#img(src = "example1.png") #, height = 280, width = 400
 
 ),
     
@@ -64,24 +65,24 @@ img(src = "example1.png") #, height = 280, width = 400
                           (verbatimTextOutput("mat")),
                          
                          (h4(p("Uniqueness table - "))),
-                         (tableOutput("uni")),
+                         (dataTableOutput("uni")),
 #                          (textOutput("text4")),
                          plotOutput("plot1",height = 600, width = 850)),
-                tabPanel("Loadings",tableOutput("loadings")),
+                tabPanel("Loadings",dataTableOutput("loadings")),
                 
 #                tabPanel("Scores",tableOutput("scores")),   # origi code
                 # my edits 16-9-2017 below:
                 tabPanel("Scores", 	# tab name
 	                      br(),
                         downloadButton('downloadDataX', 
-		                        'Download Segmentation file (Works only in browser)'), 
+		                        'Download Factor Scores File (Works only in browser)'), 
 	                      br(),br(),
-	              tableOutput("scores")),
+	                      dataTableOutput("scores")),
                 
                 tabPanel("Factor vs Variables",plotOutput("plot20",height = 600, width = 850)),
                 tabPanel("Factor vs Variables 2",plotOutput("plot2",height = 600, width = 850)),
                 tabPanel("Factor vs Users",plotOutput("plot3",height = 600, width = 850)),
-                tabPanel("Data",tableOutput("table")) 
+                tabPanel("Data",dataTableOutput("table")) 
     )
   ) 
 ) 

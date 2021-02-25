@@ -16,10 +16,11 @@ shinyUI(
         fileInput("file", "Upload data (csv file)"),
         sliderInput('sample','test sample percentage',10,40,25),
         # h4(p("Select Response Variable")),
-        sliderInput('cp','complexity parameter',0,0.1,0),
+        sliderInput('cp','complexity parameter',0,0.5,0),
         fileInput("filep", "Upload new data for prediction (csv file)"),
         htmlOutput("yvarselect"),
         htmlOutput("xvarselect"),
+      #  submitButton(text = "Apply Changes", icon("refresh")),br(),
         htmlOutput("fxvarselect")
       ),   # end of sidebar panel
       
@@ -69,10 +70,12 @@ shinyUI(
                              ),
                     tabPanel('Detailed summary of splits',verbatimTextOutput("summary")),
                     tabPanel("Decision Tree",
+                             h4('range of optimal cp'),verbatimTextOutput("cpselect"),
                              # h4('Regression Tree'),
-                             plotOutput("plot3",height = 1100),
+                             #sliderInput('height','chart height',500,5000,1100),
+                             plotOutput("plot3",height = 1600),
                        #      h4('Visualize cross-validation results'),
-                             plotOutput("plot1",height = 600, width = 850)
+                             plotOutput("plot1",height = 800)
                              ),                   
                #     tabPanel("Node labels",plotOutput("plot2",height = 600, width = 850),
                 #             #h4("First column is assigned node number for each obsrvn in model training data"),

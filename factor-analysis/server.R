@@ -1,10 +1,6 @@
 #################################################
 #               Factor Analysis                 #
 #################################################
-if (!require("shiny")) {install.packages("shiny")}
-if (!require("nFactors")) {install.packages("nFactors")}
-if (!require("qgraph")) {install.packages("qgraph")}
-if (!require("corrplot")) {install.packages("corrplot")}
 
 library("shiny")
 library("nFactors")
@@ -31,36 +27,51 @@ fname <- reactive({
   }
 })
 
+
+filtered_dataset <- reactive({if (is.null(input$file)) { return(NULL) }
+  else{
+    Dataset <- Dataset() %>% dplyr::select(!!!input$selVar)
+    return(Dataset)
+  }})
+
+
+output$colList <- renderUI({
+  varSelectInput("selVar",label = "Select Variables",data = Dataset(),multiple = TRUE,selectize = TRUE,selected = colnames(Dataset()))
+})
+
 # output$table22 <- renderTable ({ 
 #   round(cor(Dataset()),2) 
 #                                       })
 output$corplot = renderPlot({
-  
-  my_data = Dataset()
-  cor.mat <- round(cor(my_data),2)
-  corrplot(cor.mat, 
-           type = "upper",    # upper triangular form
-           order = "hclust",  # ordered by hclust groups
-           tl.col = "black",  # text label color
-           tl.srt = 45)  
+  if (is.null(input$file)) { return(NULL) }
+    else{
+      my_data = filtered_dataset()
+      cor.mat <- round(cor(my_data),2)
+      corrplot(cor.mat, 
+               type = "upper",    # upper triangular form
+               order = "hclust",  # ordered by hclust groups
+               tl.col = "black",  # text label color
+               tl.srt = 45)  
+      
+    }
+  })
 
-})    
-output$table <- renderTable({ Dataset()   })
+
+
+output$table <- renderDataTable({ Dataset() },options = list(pageLength=25))
   
 nS = reactive ({    
-  
-  if (is.null(input$file)) { return(NULL) }
-                    else{
-ev = eigen(cor(Dataset(), use = 'pairwise.complete.obs'))  # get eigenvalues
-ap = parallel(subject=nrow((Dataset())),var=ncol((Dataset())),rep=100,cent=.05);
-nS = nScree(ev$values, aparallel= ap$eigen$qevpea);
+    if (is.null(input$file)) { return(NULL) }
+    else{
+      ev = eigen(cor(filtered_dataset(), use = 'pairwise.complete.obs'))  # get eigenvalues
+      ap = parallel(subject=nrow((filtered_dataset())),var=ncol((filtered_dataset())),rep=100,cent=.05)
+      nS = nScree(ev$values, aparallel= ap$eigen$qevpea)
 }
 })
 
 output$fselect <- renderUI({ 
   if (is.null(input$file)) { return(NULL) }
   else{
-    
   numericInput("fselect", "Number of Factors:", unlist((nS())[1])[3])
   }
   })
@@ -78,7 +89,7 @@ fit = reactive ({
   if (is.null(input$file)) { return(NULL) }
   else{
     
-  fit = factanal(na.omit(Dataset()), fselect() , scores="Bartlett", rotation="varimax");
+  fit = factanal(na.omit(filtered_dataset()), fselect() , scores="Bartlett", rotation="varimax");
   return (fit)
   }
   }) 
@@ -208,7 +219,7 @@ for (i in 1:nrow(a)){
   grp = c(grp,temp)
 }
 grp = matrix(c(grp,seq(1:length(grp))),,2)
-rownames(grp) = colnames(Dataset())
+rownames(grp) = colnames(filtered_dataset())
 
 gr = vector("list", length = length(table(grp[,1])))
 for (i in 1:length(table(grp[,1]))) {
@@ -216,7 +227,7 @@ for (i in 1:length(table(grp[,1]))) {
   gr[[i]][1:length(l1)] = c(l1)   
 }
 
-qgraph(cor(Dataset(), use= 'complete.obs'),layout="spring", groups = gr, labels=names(Dataset()), label.scale=F, label.cex = 1, minimum=input$cutoffcorr)
+qgraph(cor(filtered_dataset(), use= 'complete.obs'),layout="spring", groups = gr, labels=names(filtered_dataset()), label.scale=F, label.cex = 1, minimum=input$cutoffcorr)
 }
 })
 
@@ -268,11 +279,12 @@ abline(h=0); abline(v=0)
 }
 })
 
-output$loadings <- renderTable({ 
+output$loadings <- renderDataTable({ 
   if (is.null(input$file)) { return(NULL) } else{
   # rownames((fit())$loadings) = colnames(Dataset())  # edit 2
   b2 <- unclass((fit())$loadings); rownames(b2) <- NULL;  
-  b1 <- data.frame(colnames(Dataset()), b2);# [2:ncol(Dataset())];rownames(b1) <- colnames(Dataset())  # edit 2  
+  b1 <- data.frame(colnames(filtered_dataset()), round(b2,2));
+  names(b1)[1] <- "Variable"# [2:ncol(Dataset())];rownames(b1) <- colnames(Dataset())  # edit 2  
   #-------#
   if(is.null(fname())){return(b1)}
   else{
@@ -310,23 +322,23 @@ output$mat <- renderPrint({
 # return(a)
 #  })
 
-output$uni <- renderTable({ 
+output$uni <- renderDataTable({ 
   if (is.null(input$file)) { return(NULL) }
   else{ 
     # n = ceiling(length(uni())/3)
     # matrix(uni(), ncol = 1)
-    data.frame(Variable = rownames(as.matrix(fit()$uniqueness)), Uniqueness = fit()$uniqueness)
-            }
-})
+    data.frame(Variable = rownames(as.matrix(fit()$uniqueness)), Uniqueness = round(fit()$uniqueness,2))
+    }
+},options = list(pageLength=10))
 
 
-output$scores <- renderTable({     
+output$scores <- renderDataTable({     
   if (is.null(input$file)) { return(NULL) } else{
       # rownames((fit())$scores) = rownames(Dataset()) # edit 3 i made.
       # b0 <- (fit())$scores;   rownames(b0) <- rownames(Dataset()); 
-    
-      b0 <- data.frame(rownames(Dataset()), (fit())$scores) # else ends    
-      
+      b2 <- unclass((fit())$scores); rownames(b2) <- NULL; 
+      b0 <- data.frame(rownames(filtered_dataset()), round(b2,2)) # else ends    
+      names(b0)[1] <- "Variable"
   if(is.null(fname())){return(b0)}
   else{
     names(b0)[c(-1)]<-fname()
@@ -341,7 +353,7 @@ output$scores <- renderTable({
   output$downloadDataX <- downloadHandler(
     filename = function() { "Fac_scores.csv" },
     content = function(file) {
-      write.csv(data.frame(rownames(Dataset()), (fit())$scores), file, row.names = F)
+      write.csv(data.frame(rownames(filtered_dataset()), (fit())$scores), file, row.names = F)
    				 }
 	)
 
