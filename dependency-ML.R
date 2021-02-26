@@ -38,6 +38,7 @@ try(require("partykit")||install.packages("partykit"))
 try(require("fmsb")||install.packages("fmsb"))
 try(require("PerformanceAnalytics")||install.packages("PerformanceAnalytics"))
 
+if (!require("e1071")) {install.packages("e1071")}
 if (!require("EnvStats")) {install.packages("EnvStats")}
 if (!require("fastDummies")) {install.packages("fastDummies")}
 if(!require("maptpx")) {install.packages("maptpx")}
