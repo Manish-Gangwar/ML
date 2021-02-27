@@ -11,6 +11,7 @@ if (!require("corrplot")) {install.packages("corrplot")}
 if (!require("ROCR")) {install.packages("ROCR")}
 if (!require("caret")) {install.packages("caret")}
 if (!require("Rfast")) {install.packages("Rfast")}
+if (!require("e1071")) {install.packages("e1071")}
 
 library(shiny)
 library(pastecs)
@@ -22,6 +23,7 @@ library(corrplot)
 library(ROCR)
 library(caret)
 library(Rfast)
+library(e1071)
 
 # library(gplot)
 
@@ -279,7 +281,7 @@ output$downloadData2 <- downloadHandler(
   filename = function() { "Input Data With Prediction.csv" },
   content = function(file) {
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
-    write.csv(inputprediction(), file, row.names=F, col.names=F)
+    write.csv(inputpredicted(), file, row.names=F, col.names=F)
   }
 )
 

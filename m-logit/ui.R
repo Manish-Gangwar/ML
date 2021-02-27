@@ -12,7 +12,7 @@ library("shiny")
 shinyUI(pageWithSidebar(
   # Header:
   
-  headerPanel(title=div(img(src="isb.png",align = "right"), h2("Multinomial Logit App", style="bold"))),
+  headerPanel(title=div(img(src="isb.png",align = "right"), h2("Multinomial Logit App", style="bold")), windowTitle	='Multinomial Logit'),
   
   # Input in sidepanel:
   sidebarPanel(

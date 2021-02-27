@@ -16,8 +16,7 @@ library(stringr)
 
 useSweetAlert()
 
-ui <- fluidPage(theme = shinytheme("cerulean"),
-                tagList(
+ui <- fluidPage(  tagList(
                   tags$head(tags$script(type="text/javascript", src = "code.js")),
                   navbarPage(title="Basic Data Prepration and Analysis",
                              tabPanel(title = "Upload Data",icon = icon('upload', lib = 'glyphicon'),
@@ -30,7 +29,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                         hr(),
                                         
                                         column(3,
-                                               h3("Load Example Datasets"),
+                                               h4("select example dataset"),
                                                uiOutput("data_helper"),
                                                selectInput("ex_data",
                                                            label = "",
@@ -53,10 +52,10 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                       (
                                         
                                         hr(),
-                                        h3("Upload Data"),
+                                        h4("or upload your dataset"),
                                         column(5,
                                                fileInput('file',
-                                                         label = 'Choose File',
+                                                         label = '',
                                                          placeholder = 'No File Selected')
                                         ),
                                         column(3,
@@ -82,7 +81,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                       ),#end of fluid row-1
                                       hr(),
                                       fluidRow(
-                                        h3("Review Data"),
+                                        h4("Review Data"),
                                         dataTableOutput('head')
                                       )
                                       

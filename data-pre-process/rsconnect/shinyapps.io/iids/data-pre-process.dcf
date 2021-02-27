@@ -1,0 +1,12 @@
+name: data-pre-process
+title: data-pre-process
+username:
+account: iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3695801
+bundleId: 4269647
+url: https://isb-iids.shinyapps.io/data-pre-process/
+when: 1614233780.38855
+asMultiple: FALSE
+asStatic: FALSE

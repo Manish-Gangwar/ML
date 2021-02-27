@@ -6,11 +6,8 @@ library("shiny")
 #library("foreign")
 
 shinyUI(fluidPage(
-  tags$head(includeScript("google_analytics.js")),
-  title = "Factor analysis",
-  # Header:
-  #titlePanel("Factor analysis"),
-	titlePanel(title=div(img(src="logo.png",align='right'),"Factor analysis")),
+  #titlePanel(title=div(img(src="logo.png",align='right'),"Factor analysis")),
+  headerPanel(title=div(img(src="logo.png",align = "right"), h2("Factor analysis App", style="bold")), windowTitle	='Factor analysis'),
   # Input in sidepanel:
   sidebarPanel(
     # Upload data:

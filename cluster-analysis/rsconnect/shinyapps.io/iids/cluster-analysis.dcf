@@ -5,6 +5,8 @@ account: iids
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3677405
-bundleId: 4259828
+bundleId: 4278012
 url: https://isb-iids.shinyapps.io/cluster-analysis/
-when: 1614062393.1991
+when: 1614404127.53609
+asMultiple: FALSE
+asStatic: FALSE

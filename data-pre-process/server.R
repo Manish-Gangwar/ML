@@ -1,4 +1,21 @@
 
+if (!require(shiny)) {install.packages("shiny")};  library(shiny)
+if (!require(shinythemes)) {install.packages("shinythemes")};  library(shinythemes)
+if (!require(dplyr)) {install.packages("dplyr")};  library(dplyr)
+if (!require(fastDummies)) {install.packages("fastDummies")};  library(fastDummies)
+if (!require(Hmisc)) {install.packages("Hmisc")};  library(Hmisc)
+if (!require(VIM)) {install.packages("VIM")};  library(VIM)
+if (!require(shinyWidgets)) {install.packages("shinyWidgets")};  library(shinyWidgets)
+if (!require(tidyr)) {install.packages("tidyr")};  library(tidyr)
+if (!require(datasets)) {install.packages("datasets")};  library(datasets)
+if (!require(stringr)) {install.packages("stringr")};  library(stringr)
+if (!require(shinyhelper)) {install.packages("shinyhelper")};  library(shinyhelper)
+if (!require(summarytools)) {install.packages("summarytools")};  library(summarytools)
+if (!require(descriptr)) {install.packages("descriptr")};  library(descriptr)
+if (!require(DataExplorer)){install.packages("DataExplorer")}; library(DataExplorer)
+if (!require(shinyBS)) {install.packages("shinyBS")};  library(shinyBS)
+#remove.packages("data.table")
+if (!require(data.table)) {install.packages("data.table")};  library(data.table)
 
 server <- function(input, output,session) {
   

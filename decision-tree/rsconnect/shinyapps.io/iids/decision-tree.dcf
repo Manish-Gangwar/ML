@@ -5,6 +5,8 @@ account: iids
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3506927
-bundleId: 4260821
+bundleId: 4278175
 url: https://isb-iids.shinyapps.io/decision-tree/
-when: 1614072246.10502
+when: 1614408978.76597
+asMultiple: FALSE
+asStatic: FALSE

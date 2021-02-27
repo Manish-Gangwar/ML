@@ -6,7 +6,7 @@ shinyUI(
   fluidPage(
     
   #  titlePanel("Classification and Regression Tree"),
-    headerPanel(title=div(img(src="isb.png",align = "right"), h2("Decision Tree App", style="bold"))),
+    headerPanel(title=div(img(src="isb.png",align = "right"), h2("Decision Tree App", style="bold")),windowTitle	='Decision Tree'),
     
     sidebarLayout(
       
@@ -68,7 +68,7 @@ shinyUI(
                              h4("Download Input Data with Predictions"),
                              downloadButton('downloadData0', 'Download predictions (Works only in browser)')
                              ),
-                    tabPanel('Detailed summary of splits',verbatimTextOutput("summary")),
+                    tabPanel('Summary of Splits',verbatimTextOutput("summary")),
                     tabPanel("Decision Tree",
                              h4('range of optimal cp'),verbatimTextOutput("cpselect"),
                              # h4('Regression Tree'),

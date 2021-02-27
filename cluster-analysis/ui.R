@@ -8,7 +8,7 @@ library("shiny")
 shinyUI(fluidPage(
   # Header:
   #headerPanel("Segmentation Analysis"),
-  titlePanel(title=div(img(src="logo.png",align='right'),"Cluster Analysis")),
+  titlePanel(title=div(img(src="logo.png",align='right'),h2("Cluster Analysis",style="bold")), windowTitle	='Cluster Analysis'),
   
   # Input in sidepanel:
   sidebarPanel(

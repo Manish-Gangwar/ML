@@ -7,11 +7,9 @@ library("shiny")
 #library("foreign")
  
 shinyUI(fluidPage(
-  
-  tags$head(includeScript("google_analytics.js")),
-  title = "Joint Space Map",
   # Header:
-  titlePanel(title=div(img(src="logo.png",align='right'),"Joint Space Map")),
+ # titlePanel(title=div(img(src="logo.png",align='right'),"Joint Space Map")),
+  headerPanel(title=div(img(src="logo.png",align = "right"), h2("Joint Space Map App", style="bold")), windowTitle	='Joint Space Map'),
   #titlePanel("Joint Space Map"),
   # Input in sidepanel:
   sidebarPanel(

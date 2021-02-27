@@ -5,6 +5,8 @@ account: iids
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3695413
-bundleId: 4269376
+bundleId: 4278018
 url: https://isb-iids.shinyapps.io/factor-analysis/
-when: 1614225596.87749
+when: 1614404410.60282
+asMultiple: FALSE
+asStatic: FALSE

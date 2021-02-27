@@ -5,6 +5,8 @@ account: iids
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3507042
-bundleId: 4259611
+bundleId: 4278045
 url: https://isb-iids.shinyapps.io/basic-stats/
-when: 1614060072.99817
+when: 1614405175.91401
+asMultiple: FALSE
+asStatic: FALSE

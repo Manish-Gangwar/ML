@@ -5,6 +5,8 @@ account: iids
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3507053
-bundleId: 4136388
-url: https://iids.shinyapps.io/m-logit/
-when: 1611498269.25929
+bundleId: 4278036
+url: https://isb-iids.shinyapps.io/m-logit/
+when: 1614404836.18054
+asMultiple: FALSE
+asStatic: FALSE
