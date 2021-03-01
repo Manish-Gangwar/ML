@@ -17,13 +17,11 @@ try(require("DBI")||install.packages("DBI"))
 try(require("assertthat")||install.packages("assertthat"))
 try(require("Rcpp")||install.packages("Rcpp"))
 try(require("mnormt")||install.packages("mnormt"))
-try(require("tidyr")||install.packages("tidyr"))
 try(require("ggplot2")||install.packages("ggplot2"))
 try(require("DT")||install.packages("DT"))
 try(require("reshape2")||install.packages("reshape2"))
 try(require("wordcloud")||install.packages("wordcloud"))
 try(require("plotly")||install.packages("plotly"))
-try(require("tidytext")||install.packages("tidytext"))
 try(require("magrittr")||install.packages("magrittr"))
 try(require("caret")||install.packages("caret"))
 try(require("rpart")||install.packages("rpart"))
@@ -38,6 +36,9 @@ try(require("partykit")||install.packages("partykit"))
 try(require("fmsb")||install.packages("fmsb"))
 try(require("PerformanceAnalytics")||install.packages("PerformanceAnalytics"))
 
+if (!require(randomcoloR)) {install.packages("randomcoloR")}
+if (!require(shinyWidgets)) {install.packages("shinyWidgets")}
+if (!require(stringr)) {install.packages("stringr")}
 if (!require("e1071")) {install.packages("e1071")}
 if (!require("EnvStats")) {install.packages("EnvStats")}
 if (!require("fastDummies")) {install.packages("fastDummies")}

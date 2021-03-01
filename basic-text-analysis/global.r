@@ -1,11 +1,20 @@
 
-text.clean = function(x)                    # text data
+puncts = c(",", "\\.", "!", "\\?");
+
+text.clean = function(x,html_tags,numbers)                    # text data
 { #require("tm")
-  x  =  gsub("<.*?>", " ", x)               # regex for removing HTML tags
+  x  =  tolower(x)
+  if(html_tags){
+    x  =  gsub("<.*?>", " ", x)             # regex for removing HTML tags
+  }
+  if(numbers){
+    x  =  removeNumbers(x) 
+  }# convert to lower case characters
   x  =  iconv(x, "latin1", "ASCII", sub="") # Keep only ASCII characters
   x  =  gsub("[^[:alnum:]]", " ", x)        # keep only alpha numeric
-  x  =  tolower(x)                          # convert to lower case characters
-  x  =  removeNumbers(x)                    # removing numbers
+   
+  
+                     # removing numbers
   x  =  stripWhitespace(x)                  # removing white space
   x  =  gsub("^\\s+|\\s+$", "", x)          # remove leading and trailing white space
   return(x)
@@ -134,7 +143,9 @@ dtm.tcm.creator <- function(text,id = "",
                             bigram.encoding = TRUE,
                             bigram.min.freq = 5,
                             min.dtm.freq = 2,
-                            skip.grams.window = 5) {
+                            skip.grams.window = 5,
+                            html_tags = TRUE,
+                            numbers = TRUE) {
   
   # if (class(text) != "character" | length(text) < 3){
   #   stop("data format Not correct. Make sure it's a character verctor of length above 3")
@@ -150,7 +161,7 @@ dtm.tcm.creator <- function(text,id = "",
   
   if (std.clean == TRUE) {
     # print("Performing Standard Text Cleaning")
-    text = text.clean(text)
+    text = text.clean(text,html_tags,numbers)
   }
   
   if (std.stop.words == TRUE){
@@ -243,13 +254,13 @@ bigram.collocation <- function(text1){   # text1 from readLines() is input
   text_df <- data_frame(text1) %>% 
     unnest_tokens(word, text1) %>%
     anti_join(stop_words) %>% 
-    count(word, sort = TRUE) #%>% 
+   dplyr::count(word, sort = TRUE) #%>% 
   text_df
   
   # create bigrams df
   bigram_df <- data_frame(text1) %>% 
     unnest_tokens(bigrams, text1, token = "ngrams", n = 2) %>%
-    count(bigrams, sort = TRUE) %>%
+   dplyr:: count(bigrams, sort = TRUE) %>%
     ungroup() %>%
     
     # separate & filter bigrams for stopwords
@@ -270,7 +281,7 @@ bigram.collocation <- function(text1){   # text1 from readLines() is input
     a1 = which(bigram_df$word2[i1] == text_df$word) 
     ifelse((length(a1) > 0), { new_df$k2[i1] = text_df$n[a1] }, next ) 
     
-} # i1 loop ends
+  } # i1 loop ends
   
   new_df1 = new_df %>% filter(n > 1) %>% mutate(coll.ratio = (n*nrow(new_df))/(k1*k2)) %>%
     filter(coll.ratio >= 1) %>%
@@ -281,15 +292,23 @@ bigram.collocation <- function(text1){   # text1 from readLines() is input
   return(new_df1)
 }   # func ends
 
+split_by_puncts <- function(puncts, test0){
+  for (i0 in 1:length(puncts)){test0 = str_replace_all(test0, puncts[i0], "@@")}; test0
+  a0 = tibble(phrases = str_split(test0, "@@"))
+  return(a0)
+} # util func ends
 
 concordance.r <- function(text1,  # corpus
                           word1,  # focal word for whcih context is sought
-                          k){     # context window length in words on either side
+                          k,
+                          regx){     # context window length in words on either side
   
   require(magrittr)
   require(tidytext)
   require(dplyr)
   require(tidyr)
+  require(stringi)
+  
   
   text1 = gsub('<.*?>', "", text1)   # drop html junk
   
@@ -301,23 +320,39 @@ concordance.r <- function(text1,  # corpus
   
   text_df
   
-  # locate context words for each instance of the focal word
-  a0 = which(text_df$word == word1)
+  if(regx==TRUE){
+    a0 = which(stringr::str_detect(text_df$word,word1))
+  }else{
+    #a0 = which(stringr::str_detect(text_df$word,word1))
+    # a0 = grep(text_df$word,pattern = word1)
+    a0 = which(text_df$word == word1)
+  }
   a1 = matrix(0, nrow = length(a0), ncol = 3)
   colnames(a1) = c("start", "focal", "stop")
   for (i1 in 1:nrow(a1)){a1[i1, 1] = max(0, a0[i1]-k) 
   a1[i1, 2] = a0[i1]
   a1[i1, 3] = min(nrow(text_df), a0[i1]+k)  }
   head(a1)
-  
-  require(stringi)
-  # creat a list to store the contexts or concordances of word1  
   list0 = vector("list", length = length(a0))
-  for (i2 in 1:length(list0)){
-    list0[[i2]] = stri_join(text_df$word[a1[i2,1]:a1[i2, 3]], collapse=" ") 
-    list0[[i2]] = gsub(word1, paste0('*', word1, '*', collapse=""), list0[[i2]])   # gsub(pattern, replacement, x)
-  } # i2 ends
-  list0[[2]]
+  if(regx==TRUE){
+    for (i2 in 1:length(list0)){
+      vec2join <- text_df$word[a1[i2,1]:a1[i2, 3]]
+      vec2join <- append(vec2join,"<mark>",after = k)
+      vec2join <- append(vec2join,"</mark>",after=k+2)
+      list0[[i2]] = stri_join(vec2join, collapse=" ") 
+      #list0[[i2]] = gsub(word1, paste0('<mark>', word1, '</mark>', collapse=""), list0[[i2]])   # gsub(pattern, replacement, x)
+    } # i2 ends
+  }else{
+    for (i2 in 1:length(list0)){
+      list0[[i2]] = stri_join(text_df$word[a1[i2,1]:a1[i2, 3]], collapse=" ") 
+      list0[[i2]] = gsub(word1, paste0('<mark>', word1, '</mark>', collapse=""), list0[[i2]])   # gsub(pattern, replacement, x)
+    } # i2 ends
+    list0[[2]]
+  }
+  # creat a list to store the contexts or concordances of word1  
+  
+  
+  
   
   # read list into dataframe for easier display of output  
   list_df = data.frame(NULL)
@@ -325,3 +360,200 @@ concordance.r <- function(text1,  # corpus
   colnames(list_df) = 'concordance'
   
   return(list_df) } # func ends
+
+
+
+
+## define func to stopword-remove from raw_corpus
+drop_stopwords_corpus <- function(raw_corpus, custom.stopwords=NULL, use.tidy.stopwords=FALSE){
+  
+  library(tidyverse)
+  library(tidytext)
+  library(stringr)
+  
+  # setup stop.words df first
+  stop.words = data.frame(word = unique(c(custom.stopwords, c("the", "a", "an", "of"))), stringsAsFactors=FALSE)
+  if (use.tidy.stopwords == "TRUE") {
+    stop.words = data.frame(word = unique(c(unlist(stop.words), stop_words$word)), stringsAsFactors=FALSE)}
+  
+  ## piped workflow for stopword-removal from corpus
+  a0 = raw_corpus %>% data_frame() %>% 
+    mutate(docID = row_number()) %>% rename(text = ".") %>% select(docID, text) %>%
+    
+    # sentence-tokenize and build sentence layer
+    unnest_tokens(sentence, text, token = "sentences") %>% 
+    # group_by(docID) %>% 
+    mutate(sentID=row_number()) %>% 
+    select(docID, sentID, sentence) %>%
+    
+    # word-tokenize and drop stopwords
+    unnest_tokens(word, sentence) %>% 
+    anti_join(stop.words) #%>%
+  
+  # rebuilding corpus, first at sentence layer
+  sent_corpus = data.frame(docID = numeric(), sentID = numeric(), 
+                           sentence = character(), stringsAsFactors=FALSE)
+  
+  for (i1 in 1:max(a0$sentID)){
+    a100 = a0[a0$sentID == i1,]   # for each sentence, collect all cleaned tokens
+    sent_corpus[i1, 1] =  a100$docID[1]
+    sent_corpus[i1, 2] =  a100$sentID[1]
+    sent_corpus[i1, 3] = paste0(str_c(a100$word, collapse=" "), ".")   # using str_c()
+  }   # i1 ends
+  
+  b0 = which(is.na(sent_corpus$docID))
+  if (length(b0)>0) {sent_corpus = sent_corpus[-b0,]}
+  
+  # rebuilding corpus, now at doc layer
+  doc_corpus = data.frame(docID = numeric(), text = character(), stringsAsFactors=FALSE)
+  
+  for (i2 in 1:max(sent_corpus$docID)){
+    a200 = sent_corpus[sent_corpus$docID == i2,] 	
+    doc_corpus[i2, 1] = a200$docID[1]	
+    doc_corpus[i2, 2] = str_c(a200$sentence, collapse=" ")    }    # i2 ends
+  
+  return(doc_corpus) }    # drop_stopwords_corpus() func ends 
+
+# # testing above func
+# speech = readLines('https://raw.githubusercontent.com/sudhir-voleti/sample-data-sets/master/PM%20speech%202014.txt')
+# system.time({  new_corpus = drop_stopwords_corpus(speech, use.tidy.stopwords=TRUE)  })    # 0.26 secs
+# 
+# 
+# a21 <- a2
+
+## == define collect_terms() routine for calling inside replace_bigrams()
+collect_terms <- function(a21){  # sentence has colms {docID, sentID, word1, word2, bigram1, out_colm}
+  
+  b100 = (is.na(a21$bigram1))
+  a21$bigram1[b100] = a21$word1[b100]
+  
+  a21$word2[!(b100)] = ""
+  bigram2 = c(a21$bigram1[2:nrow(a21)], a21$word2[nrow(a21)]); bigram2
+  bigram2[!(b100)] = ""; bigram2
+  bigram2 = c(a21$word1[1], 
+              bigram2[1:(length(bigram2)-2)], 
+              paste(bigram2[nrow(a21)-1], a21$word2[nrow(a21)], sep=" ")); bigram2
+  
+  a21$out_colm = bigram2
+  # return(a21)  }
+  return(a21)  }
+
+# a21 = a2[a2$sentID == 2,] %>% mutate(out_colm = bigram1); a21; collect_terms(a21)
+
+
+# raw_corpus <- speech
+# 
+# 
+
+#raw_corpus <- Document
+#stopw_list <- c("will","shall")
+
+## == brew func to build bigrams.
+replace_bigram <- function(raw_corpus, stopw_list, min_freq = 2){
+  
+  # first filter out stopwords.
+  print(
+    system.time({ 
+      
+      # textdf = drop_stopwords_corpus(raw_corpus, custom.stopwords=c("and", "to")) 
+      #corpus = str_replace_all(tolower(raw_corpus), c(" of ", " the ", " and "), " ") 
+      
+      corpus = str_replace_all(tolower(raw_corpus[,2]), stopw_list, " ") 
+      textdf = data.frame(docID=seq(1:length(corpus)),nick=raw_corpus[,1], text=corpus, stringsAsFactors=FALSE)
+      a1 = textdf$text %>% split_by_puncts(puncts,.) #----New
+      temp <-lapply(a1$phrases, function(x) str_c(x,collapse = ","))
+      temp <- unlist(temp)
+      textdf$text <- temp
+      temp <- NULL
+      
+      
+    })   ) # 0.26 secs for speech
+  
+  # create sentence layer and unnesting bigrams
+  a0 = textdf %>% 	
+    unnest_tokens(sentence, text, token = "sentences") %>% 
+    dplyr::mutate(sentID=row_number()) %>% 
+    dplyr::select(docID, sentID,nick, sentence) %>%
+    
+    # bigram-tokenize, count and filter by freq
+    group_by(sentID) %>% unnest_tokens(ngram, sentence, token = "ngrams", n = 2) %>% ungroup() #%>%
+  
+  a0
+  
+  # creating frequent bigrams for replacement
+  a1 = a0 %>% 
+    dplyr::count(ngram, sort=TRUE) %>% dplyr::filter(n >= min_freq) %>% 
+    separate(ngram, c("word1", "word2"), sep=" ", remove=FALSE) %>% 
+    
+    # drop all stopwords in the bigrams of interest
+    dplyr::filter(!word1 %in% stop_words$word) %>%
+    dplyr::filter(!word2 %in% stop_words$word) %>%
+    
+    unite(bigram1, c("word1", "word2"), sep="_")	%>% 
+    dplyr::select(ngram, bigram1)
+  a1
+  
+  # merging the 2 above dfs
+  a2 = dplyr::left_join(a0, a1, by=c("ngram" = "ngram")) %>%
+    separate(ngram, c("word1", "word2"), sep=" ", remove=FALSE) %>%
+    dplyr:: select(-ngram)
+  a2
+  
+  
+  a3 <- collect_terms(a2)
+  #a3 <- a21
+  # building bigram2
+  # a3 = a2 %>% mutate(out_colm = bigram1) %>% 
+  #   group_by(sentID) %>% 
+  #   transmute(out_colm = collect_terms()) %>% 
+  #   ungroup() # %>%
+  # 
+  # a3<- a21
+  b0 = which(is.na(a3$docID))
+  if (length(b0)>0) {a3 = a3[-b0,]}
+  
+  a3
+  
+  # rebuilding corpus, first at sentence layer
+  sent_corpus = data.frame(docID = numeric(), sentID = numeric(), nick=character(),
+                           sentence = character(), stringsAsFactors=FALSE)
+  
+  for (i1 in 1:max(a3$sentID)){
+    a100 = a3[a3$sentID == i1,]   # for each sentence, collect all cleaned tokens
+    sent_corpus[i1, 1] =  a100$docID[1]
+    sent_corpus[i1, 2] =  a100$sentID[1]
+    sent_corpus[i1,3] = a100$nick[1]
+    sent_corpus[i1, 4] = paste0(str_c(a100$out_colm, collapse=" "), ".")   # using str_c()
+  }   # i1 ends
+  
+  b0 = which(is.na(sent_corpus$docID))
+  if (length(b0)>0) {sent_corpus = sent_corpus[-b0,]}
+  
+  # rebuilding corpus, now at doc layer
+  doc_corpus = data.frame(docID = numeric(),nick=character(), text = character(), stringsAsFactors=FALSE)
+  
+  for (i2 in 1:max(sent_corpus$docID)){
+    a200 = sent_corpus[sent_corpus$docID == i2,] 	
+    doc_corpus[i2, 1] = a200$docID[1]	
+    doc_corpus[i2,2] = a200$nick[1]
+    doc_corpus[i2, 3] = str_c(a200$sentence, collapse=" ")    }    # i2 ends
+  
+  return(doc_corpus) }    # replace_bigrams() func ends 
+# 
+# # testing on speech
+#speech = readLines('https://raw.githubusercontent.com/sudhir-voleti/sample-data-sets/master/PM%20speech%202014.txt')
+
+
+# stopw_list <- c("dear","countrymen")
+# system.time({ bigrammed_corpus = replace_bigram(speech, min_freq = 2,stopw_list = stopw_list) }) # 0.66 secs
+# bigrammed_corpus[1:3,]
+# 
+
+
+
+
+
+
+
+
+

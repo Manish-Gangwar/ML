@@ -1,0 +1,12 @@
+name: basic-text-analysis
+title: basic-text-analysis
+username:
+account: iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3713560
+bundleId: 4284111
+url: https://isb-iids.shinyapps.io/basic-text-analysis/
+when: 1614577633.66426
+asMultiple: FALSE
+asStatic: FALSE
