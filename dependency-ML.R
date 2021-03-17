@@ -8,6 +8,7 @@ try(require("wordcloud") || install.packages("wordcloud"))
 try(require("slam") || install.packages("slam"))
 try(require("stringi") || install.packages("stringi"))
 try(require("tidytext") || install.packages("tidytext"))
+if (!require("textrank")) {install.packages("textrank")}
 try(require("tidyr") || install.packages("tidyr"))
 try(require("igraph")|| install.packages("igraph"))
 try(require("visNetwork")|| install.packages('visNetwork'))
@@ -36,9 +37,9 @@ try(require("partykit")||install.packages("partykit"))
 try(require("fmsb")||install.packages("fmsb"))
 try(require("PerformanceAnalytics")||install.packages("PerformanceAnalytics"))
 
-if (!require(randomcoloR)) {install.packages("randomcoloR")}
-if (!require(shinyWidgets)) {install.packages("shinyWidgets")}
-if (!require(stringr)) {install.packages("stringr")}
+if (!require("randomcoloR")) {install.packages("randomcoloR")}
+if (!require("shinyWidgets")) {install.packages("shinyWidgets")}
+if (!require("stringr")) {install.packages("stringr")}
 if (!require("e1071")) {install.packages("e1071")}
 if (!require("EnvStats")) {install.packages("EnvStats")}
 if (!require("fastDummies")) {install.packages("fastDummies")}
@@ -56,6 +57,8 @@ if(!require("grid")) {install.packages("grid")}
 if(!require("cluster")) {install.packages("cluster")}
 if(!require("mclust")) {install.packages("mclust")}
 if(!require("MASS")) {install.packages("MASS")}
+if(!require("mda")) {install.packages("mda")}
+if(!require("klaR")) {install.packages("klaR")}
 if(!require("gridExtra")) {install.packages("gridExtra")}
 if(!require("tesseract")) {install.packages("tesseract")}
 

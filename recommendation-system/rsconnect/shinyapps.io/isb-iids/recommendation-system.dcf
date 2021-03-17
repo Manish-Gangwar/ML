@@ -1,0 +1,12 @@
+name: recommendation-system
+title: recommendation-system
+username:
+account: isb-iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3766388
+bundleId: 4324984
+url: https://isb-iids.shinyapps.io/recommendation-system/
+when: 1615360557.53148
+asMultiple: FALSE
+asStatic: FALSE

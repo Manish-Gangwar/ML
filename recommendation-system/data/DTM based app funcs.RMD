@@ -1,0 +1,129 @@
+---
+title: "Text_2_Recommations R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+Hi,
+
+## App details - Outputs
+
+Plan is to build a new app called **collaborative-filtering-app** which will have an 
+* *Overview* tab, 
+* an *Example datasets* tab, 
+* a *DTM descriptives tab*, 
+* a *IBCF recommendations* tab and finally 
+* a *UBCF recommendations* tab.
+
+### App details - input UI
+
+In terms of user input, user 
+* uploads DTM file (from either basic-textAn app or text-networks app), 
+* selects the focal.user (from dropdown) for whom prediction must be done, and
+* selects number of brand recommendations to show (using slider)
+
+In this RMD, I demo some simple recommendation engine functionality (both user-based as well as item-based collaborative filtering) atop a simple DTM built from unstruc raw text data on brand preferences.
+
+Behold.
+
+P.S. I will assume that the raw corpus will be revised in the basic-text-an app to hard-code bigrams into the raw text.
+
+Step 1 - DTM descriptives
+
+```{r}
+library(quanteda)
+library(ggplot2)
+library(magrittr)
+library(text2vec)  # for sim2 func
+
+
+# read-in DTM
+#dtm <- read.csv(file.choose(), header=TRUE)
+dtm <- read.csv("dtm_to_network_an.csv", header=TRUE)
+
+dim(dtm)  # DTM size must be shown in descriptives output
+dtm[1:10, 1:10] # show this too in descriptives
+
+## basic pre-proc
+rownames(dtm) = dtm[,1]
+dtm = dtm[,2:ncol(dtm)]
+
+## descriptive summary of DTM
+a0 = colSums(dtm)
+a1 = sort(a0, decreasing=TRUE, index.return=TRUE)
+a2 = as.matrix(a0[a1$ix])
+token_freqs = data.frame(freq = a2)
+head(token_freqs, 10) # 2nd output. Sorted freqs
+
+## not coming well, below code
+#ggplot(token_freqs, aes(freq)) + geom_histogram(bins = min(200, nrow(token_freqs)))
+
+```
+
+## Step 2 - func to compute collaborative filtering (CF)s
+
+```{r}
+
+## setting input defaults
+require(text2vec)
+focal.user = "Ox" # say. This comes from USER INPUT
+n0 = 10 # top n0 unrated items user might like. again, USER INPUT
+
+dtm2CF <- function(dtm, focal.user, n0){
+
+  ## Finding similarities of all the item pairs.
+  a3 = sim2(as.matrix(t(dtm)), method = "cosine", norm="l2") # item-item simil matrix
+  a4 = sim2(as.matrix(dtm), method = "cosine", norm="l2") # user-user simil matrix
+  
+  ## IBCF: Generating the missing ratings in the table
+  a5 = a4 %*% as.matrix(dtm) %*% a3 # 0.01s  single, simple step using matrix multiplication
+  a5a = apply(a5, 1, function(x) {x/max(x)}) # 0 s!
+  a5a = t(a5a)
+  
+  ## Find unrated items focal.user i0 might most like.
+  i0 = which(rownames(a5a) == focal.user) # doc index num of focal.user
+  a6 = a5a[i0, (dtm[i0,] == 0)] # retain only brands focal.user hasn't yet rated
+  a7 = sort(a6, decreasing=TRUE, index.return=TRUE) # sort by predicted ratings
+  output0_ibcf = data.frame(IBCF.Recommended.brands = names(a6[a7$ix[1:n0]]), 
+                            Pref.Prob = as.matrix(round(a6[a7$ix[1:n0]], 3)))
+  
+  rownames(output0_ibcf) = NULL
+  output0_ibcf
+  
+  ## same for UBCF
+  a8 = a4 %*% as.matrix(dtm)
+  a9 = a4 %*% rep(1, nrow(a4))
+  a10 = matrix(rep(as.vector(a9)), nrow(a4), ncol(a8))
+  a11 = a8 / a10
+  a12 = a11[i0, (dtm[i0,] == 0)] 
+  a13 = sort(a12, decreasing=TRUE, index.return=TRUE) # 
+  output0_ubcf = data.frame(UBCF.Recommended.brands = names(a12[a13$ix[1:n0]]), 
+                            Pref.Prob = as.matrix(round(a12[a13$ix[1:n0]], 3)))
+  
+  rownames(output0_ubcf) = NULL
+  output0_ubcf  
+  
+  return(list(output0_ibcf, output0_ubcf)) 
+
+  } # func ends
+
+```
+
+Let's test-drive above func
+```{r}
+## test-drive
+
+system.time({ CF.list = dtm2CF(dtm, "Bubbles", 12) })  # 0.06 s
+
+ibcf.brands = CF.list[[1]]; print(ibcf.brands)
+
+ubcf.brands = CF.list[[2]]; ubcf.brands
+
+```
+
+Above two can be shown in their separate tabs. Have sortable HTML tables where necessary.
+
+Any Qs, ask me.
+
+Sudhir

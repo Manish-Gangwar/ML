@@ -1,0 +1,12 @@
+name: text_summarization
+title: text_summarization
+username:
+account: isb-iids
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3766441
+bundleId: 4324847
+url: https://isb-iids.shinyapps.io/text_summarization/
+when: 1615359665.66703
+asMultiple: FALSE
+asStatic: FALSE
